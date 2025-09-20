@@ -1,0 +1,55 @@
+{
+    "name": "@userfrosting/theme-crud6",
+    "version": "6.0.0-beta.4",
+    "type": "module",
+    "description": "CRUD6 Theme for UserFrosting",
+    "funding": "https://opencollective.com/userfrosting",
+    "license": "MIT",
+    "author": "Srinivas Nukala (https://srinivasnukala.com/)",
+    "contributors": [
+        "Alexander Weissman (https://alexanderweissman.com/)",
+        "Louis Charette (https://bbqsoftwares.com/)"
+    ],
+    "keywords": [
+        "CRUD6",
+        "UserFrosting",
+        "UiKit",
+        "theme"
+    ],
+    "homepage": "https://github.com/userfrosting/theme-crud6#readme",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/userfrosting/theme-crud6.git"
+    },
+    "bugs": {
+        "url": "https://github.com/userfrosting/UserFrosting/issues"
+    },
+    "exports": {
+        ".": "./src/index.ts",
+        "./components/pages/crud6": "./src/components/Pages/CRUD6/index.ts",
+        "./views": "./src/views/index.ts",
+        "./less/*": "./src/less/*"
+    },
+    "files": [
+        "src/"
+    ],
+    "dependencies": {
+        "@fontsource/montserrat": "^5.2.5",
+        "@fortawesome/fontawesome-free": "^6.6.0",
+        "@fortawesome/fontawesome-svg-core": "^6.4.2",
+        "@fortawesome/free-brands-svg-icons": "^6.4.2",
+        "@fortawesome/free-regular-svg-icons": "^6.4.2",
+        "@fortawesome/free-solid-svg-icons": "^6.4.2",
+        "@fortawesome/vue-fontawesome": "^3.0.3",
+        "uikit": "^3.16.26"
+    },
+    "peerDependencies": {
+        "@userfrosting/theme-pink-cupcake": "^6.0.0-beta.4",
+        "@userfrosting/sprinkle-crud6": "^0.1",
+        "axios": "^1.5.0",
+        "pinia": "^2.1.6",
+        "pinia-plugin-persistedstate": "^3.2.0",
+        "vue": "^3.4.21",
+        "vue-router": "^4.2.4"
+    }
+}

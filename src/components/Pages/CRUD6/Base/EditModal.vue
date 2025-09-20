@@ -1,0 +1,40 @@
+<script setup lang="ts">
+import UIkit from 'uikit'
+import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
+import CRUD6Form from './Form.vue'
+
+/**
+ * Props - The group to edit.
+ */
+const props = defineProps<{
+    group: CRUD6Interface
+}>()
+
+/**
+ * Emits - Define the saved event. This event is emitted when the form is saved
+ * to notify the parent component to refresh the data.
+ */
+const emits = defineEmits(['saved'])
+
+/**
+ * Methods - Submit the form to the API and handle the response.
+ */
+const formSuccess = () => {
+    emits('saved')
+    UIkit.modal('#modal-crud6-edit-' + props.crud6.id).hide()
+}
+</script>
+
+<template>
+    <a :href="'#modal-crud6-edit-' + props.crud6.id" v-bind="$attrs" uk-toggle>
+        <slot> <font-awesome-icon icon="pen-to-square" fixed-width /> {{ $t('CRUD6.EDIT') }} </slot>
+    </a>
+
+    <!-- This is the modal -->
+    <UFModal :id="'modal-crud6-edit-' + props.crud6.id" closable>
+        <template #header> {{ $t('CRUD6.EDIT') }} </template>
+        <template #default>
+            <CRUD6Form :crud6="props.crud6" @success="formSuccess()" />
+        </template>
+    </UFModal>
+</template>
