@@ -1,7 +1,13 @@
 <script setup lang="ts">
+
+// TODO : Rewrite this to use useCRUD6Schema to get the fields and labels dynamically instead of hardcoding them
+// Need to maintain the compatibility with the Userfrosting 6 features like Sprunjer, Form, Permissions, etc.
+// user userfrosting/sprinkle-admin in that Group as reference
+
 import { watch } from 'vue'
 import { useCRUD6Api } from '@ssnukala/sprinkle-crud6/composables'
 import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
+import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 
 /**
  * Props - Optional group object for editing.

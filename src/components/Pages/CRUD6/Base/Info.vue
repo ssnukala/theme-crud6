@@ -12,6 +12,9 @@ const { crud6 } = defineProps<{
 const emits = defineEmits(['crud6Updated'])
 </script>
 
+<!-- TODO : This is just copied from Group, need to update this template to read from the schema
+ so we can build the form dynamically -->
+
 <template>
     <UFCardBox>
         <div class="uk-text-center">
@@ -22,7 +25,6 @@ const emits = defineEmits(['crud6Updated'])
             {{ crud6.description }}
         </p>
         <hr />
-        <!-- TODO : Find a way to slot the description list -->
         <dl class="uk-description-list" v-if="$checkAccess('view_crud6_field')">
             <dt><font-awesome-icon icon="users" /> {{ $t('USER', crud6.users_count) }}</dt>
             <dd>

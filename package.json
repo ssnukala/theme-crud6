@@ -26,7 +26,9 @@
     },
     "exports": {
         ".": "./src/index.ts",
+        "./components": "./src/components/index.ts",
         "./components/pages/crud6": "./src/components/Pages/CRUD6/index.ts",
+        "./plugins": "./src/plugins/index.ts",
         "./views": "./src/views/index.ts",
         "./less/*": "./src/less/*"
     },
@@ -41,7 +43,8 @@
         "@fortawesome/free-regular-svg-icons": "^6.4.2",
         "@fortawesome/free-solid-svg-icons": "^6.4.2",
         "@fortawesome/vue-fontawesome": "^3.0.3",
-        "uikit": "^3.16.26"
+        "uikit": "^3.16.26",
+        "@ssnukala/sprinkle-crud6": "git+https://github.com/ssnukala/sprinkle-crud6.git#latest"
     },
     "peerDependencies": {
         "@userfrosting/theme-pink-cupcake": "^6.0.0-beta.4",

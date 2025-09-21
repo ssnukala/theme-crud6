@@ -1,5 +1,6 @@
 import type { App } from 'vue'
 
+import CRUD6Sprinkle from './plugins/crud6'
 /**
  * Import UIkit and its icons.
  */
@@ -15,6 +16,7 @@ UIkit.use(Icons)
  */
 export default {
     install: (app: App) => {
+        app.use(CRUD6Sprinkle)
         // Nothing to do here for now.
     }
 }

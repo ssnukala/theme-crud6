@@ -1,26 +1,27 @@
 <script setup lang="ts">
-import GroupCreateModal from '../../components/Pages/Admin/Group/GroupCreateModal.vue'
-import GroupEditModal from '../../components/Pages/Admin/Group/GroupEditModal.vue'
-import GroupDeleteModal from '../../components/Pages/Admin/Group/GroupDeleteModal.vue'
+import CRUD6CreateModal from '../../components/Pages/CRUD6/Base/CreateModal.vue'
+import CRUD6EditModal from '../../components/Pages/CRUD6/Base/EditModal.vue'
+import CRUD6DeleteModal from '../../components/Pages/CRUD6/Base/DeleteModal.vue'
+import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 </script>
 
 <template>
     <UFCardBox>
         <UFSprunjeTable dataUrl="/api/groups" searchColumn="name">
             <template #actions="{ sprunjer }">
-                <GroupCreateModal
+                <CRUD6CreateModal
                     @saved="sprunjer.fetch()"
                     class="uk-button uk-button-primary"
                     v-if="$checkAccess('create_group')" />
             </template>
 
             <template #header>
-                <UFSprunjeHeader sort="name">{{ $t('GROUP.NAME') }}</UFSprunjeHeader>
-                <UFSprunjeHeader sort="description">{{ $t('DESCRIPTION') }}</UFSprunjeHeader>
+                <UFSprunjeHeader sort="name">{{ $t('CRUD6.NAME') }}</UFSprunjeHeader>
+                <UFSprunjeHeader sort="description">{{ $t('CRUD6.DESCRIPTION') }}</UFSprunjeHeader>
                 <UFSprunjeHeader sort="users_count" class="uk-width-small">{{
-                    $t('USER', 2)
+                    $t('CRUD6.USER', 2)
                 }}</UFSprunjeHeader>
-                <UFSprunjeHeader>{{ $t('ACTIONS') }}</UFSprunjeHeader>
+                <UFSprunjeHeader>{{ $t('CRUD6.ACTIONS') }}</UFSprunjeHeader>
             </template>
 
             <template #body="{ row, sprunjer }">
@@ -58,14 +59,14 @@ import GroupDeleteModal from '../../components/Pages/Admin/Group/GroupDeleteModa
                                 </RouterLink>
                             </li>
                             <li>
-                                <GroupEditModal
+                                <CRUD6EditModal
                                     :group="row"
                                     @saved="sprunjer.fetch()"
                                     v-if="$checkAccess('update_group_field')"
                                     class="uk-drop-close" />
                             </li>
                             <li>
-                                <GroupDeleteModal
+                                <CRUD6DeleteModal
                                     :group="row"
                                     @deleted="sprunjer.fetch()"
                                     class="uk-drop-close"
