@@ -4,10 +4,10 @@ import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 import CRUD6Form from './Form.vue'
 
 /**
- * Props - The group to edit.
+ * Props - The CRUD6 object to edit.
  */
 const props = defineProps<{
-    group: CRUD6Interface
+    crud6: CRUD6Interface
 }>()
 
 /**
