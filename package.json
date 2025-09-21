@@ -35,6 +35,13 @@
     "files": [
         "src/"
     ],
+    "scripts": {
+        "dev": "vite dev --host",
+        "build": "vite build",
+        "preview": "vite preview",
+        "test": "vitest",
+        "test:coverage": "vitest --coverage"
+    },
     "dependencies": {
         "@fontsource/montserrat": "^5.2.5",
         "@fortawesome/fontawesome-free": "^6.6.0",
@@ -43,8 +50,9 @@
         "@fortawesome/free-regular-svg-icons": "^6.4.2",
         "@fortawesome/free-solid-svg-icons": "^6.4.2",
         "@fortawesome/vue-fontawesome": "^3.0.3",
-        "uikit": "^3.16.26",
-        "@ssnukala/sprinkle-crud6": "git+https://github.com/ssnukala/sprinkle-crud6.git#latest"
+        "@ssnukala/sprinkle-crud6": "git+https://github.com/ssnukala/sprinkle-crud6.git#main",
+        "@ssnukala/theme-crud6": "git+https://github.com/ssnukala/theme-crud6.git#main",
+        "uikit": "^3.16.26"
     },
     "peerDependencies": {
         "@userfrosting/theme-pink-cupcake": "^6.0.0-beta.4",
@@ -53,5 +61,19 @@
         "pinia-plugin-persistedstate": "^3.2.0",
         "vue": "^3.4.21",
         "vue-router": "^4.2.4"
+    },
+    "devDependencies": {
+        "@types/node": "^20.0.0",
+        "@types/uikit": "^3.0.0",
+        "@vue/test-utils": "^2.4.0",
+        "@vitejs/plugin-vue": "^6.0.0",
+        "@modyfi/vite-plugin-yaml": "^1.0.0",
+        "happy-dom": "^12.0.0",
+        "vite": "^6.0.0",
+        "vitest": "^2.0.0",
+        "@vitest/coverage-v8": "^2.0.0",
+        "@tsconfig/node20": "^20.1.6",
+        "@vue/tsconfig": "^0.8.1",
+        "typescript": "^5.9.2"
     }
 }
