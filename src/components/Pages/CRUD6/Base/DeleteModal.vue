@@ -9,14 +9,14 @@ import { Severity } from '@userfrosting/sprinkle-core/interfaces'
 const { deleteCRUD6 } = useCRUD6Api()
 
 /**
- * Props - The group object to delete
+ * Props - The CRUD6 object to delete
  */
 const props = defineProps<{
-    group: CRUD6Interface
+    crud6: CRUD6Interface
 }>()
 
 /**
- * Emits - Define the deleted event. This event is emitted when the group is deleted
+ * Emits - Define the deleted event. This event is emitted when the CRUD6 object is deleted
  * to notify the parent component to refresh the data.
  */
 const emits = defineEmits(['deleted'])
@@ -48,7 +48,7 @@ const deleteConfirmed = () => {
         :rejectIcon="null"
         :acceptSeverity="Severity.Danger">
         <template #prompt>
-            <div v-html="$t('CRUD6.DELETE_CONFIRM', crud6)"></div>
+            <div v-html="$t('CRUD6.DELETE_CONFIRM', props.crud6)"></div>
         </template>
     </UFModalConfirmation>
 </template> 
