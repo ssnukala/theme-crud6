@@ -112,6 +112,36 @@ const formSuccess = () => {
 </template>
 ```
 
+#### Create Modal Pattern
+For create modals, don't pass a prop (follows UserFrosting Group pattern):
+
+```vue
+<script setup lang="ts">
+import UIkit from 'uikit'
+import CRUD6Form from './Form.vue'
+
+const emits = defineEmits(['saved'])
+
+const formSuccess = () => {
+    emits('saved')
+    UIkit.modal('#modal-crud6-create').hide()
+}
+</script>
+
+<template>
+    <a v-bind="$attrs" :uk-toggle="'target: #modal-crud6-create'">
+        <slot><font-awesome-icon icon="plus" /> {{ $t('CRUD6.CREATE') }}</slot>
+    </a>
+
+    <UFModal id="modal-crud6-create" closable>
+        <template #header>{{ $t('CRUD6.CREATE') }}</template>
+        <template #default>
+            <CRUD6Form @success="formSuccess()" />
+        </template>
+    </UFModal>
+</template>
+```
+
 ### 2. Form Components
 Forms must be **completely schema-driven**:
 
@@ -235,33 +265,41 @@ const canEditField = (fieldKey: string) => {
 ## API Integration Patterns
 
 ### 1. Composable Usage
-ALWAYS use the provided composables:
+ALWAYS use the provided composables, following UserFrosting naming conventions:
 
 ```typescript
-// API operations
+// API operations (follows UserFrosting pattern: use{Entity}Api)
 const { 
-    fetchCRUD6, 
-    fetchCRUD6Row, 
-    createRow, 
-    updateRow, 
-    deleteRow,
+    fetchCRUD6,           // Fetch list of entities
+    fetchCRUD6Row,        // Fetch single entity  
+    createRow,            // Create new entity
+    updateRow,            // Update existing entity
+    deleteRow,            // Delete entity
     apiLoading, 
     apiError,
     formData,
-    resetForm 
+    resetForm,
+    slugLocked            // For slug field management
 } = useCRUD6Api()
 
-// Schema operations
+// Schema operations (schema-specific composable)
 const {
-    schema,
+    schema,               // Current schema object
     loading: schemaLoading,
     error: schemaError,
-    loadSchema,
-    hasPermission,
-    tableColumns,
-    defaultSort
+    loadSchema,           // Load schema for a model
+    hasPermission,        // Check permissions
+    tableColumns,         // Get table column definitions
+    defaultSort          // Get default sorting
 } = useCRUD6Schema()
 ```
+
+**Important**: The composable methods follow UserFrosting patterns:
+- `create{Entity}` for creating new records
+- `update{Entity}` for updating existing records  
+- `delete{Entity}` for deleting records
+- `fetch{Entity}` for getting lists
+- `fetch{Entity}Row` for getting single records
 
 ### 2. Error Handling
 Follow UserFrosting error patterns:
@@ -548,9 +586,95 @@ This theme extends `@ssnukala/sprinkle-crud6`:
 - Follow UIKit component patterns for modals, forms, and tables
 - Use FontAwesome icons consistently with UserFrosting patterns
 
-## Summary
+## Internationalization (i18n) Patterns
 
-When developing any component for theme-crud6:
+### 1. Translation Keys
+Follow UserFrosting translation key conventions:
+
+```vue
+<!-- Entity-specific translations -->
+{{ $t('CRUD6.CREATE') }}
+{{ $t('CRUD6.EDIT') }}
+{{ $t('CRUD6.DELETE') }}
+{{ $t('CRUD6.DELETE_CONFIRM', entityObject) }}
+
+<!-- Generic translations from core -->
+{{ $t('SAVE') }}
+{{ $t('CANCEL') }}
+{{ $t('LOADING') }}
+{{ $t('ENABLED') }}
+{{ $t('DISABLED') }}
+
+<!-- Form field labels -->
+{{ $t('NAME') }}
+{{ $t('DESCRIPTION') }}
+{{ $t('SLUG') }}
+
+<!-- Status and count translations -->
+{{ $t('USER', count) }}  <!-- For pluralization -->
+{{ $t('STATUS') }}
+```
+
+### 2. Translation with Parameters
+Pass objects for variable substitution (UserFrosting pattern):
+
+```vue
+<div v-html="$t('CRUD6.DELETE_CONFIRM', props.crud6)"></div>
+```
+
+## UIKit and FontAwesome Integration
+
+### 1. UIKit Classes
+Use UIKit classes consistently throughout:
+
+```vue
+<!-- Layout classes -->
+<div class="uk-container uk-container-large">
+<div class="uk-grid-small" uk-grid>
+<div class="uk-width-1-2@m">
+
+<!-- Card components -->
+<div class="uk-card uk-card-default uk-card-body">
+
+<!-- Form styling -->
+<form class="uk-form-stacked">
+<div class="uk-margin">
+<label class="uk-form-label">
+<input class="uk-input" :class="{ 'uk-form-danger': hasError }">
+
+<!-- Button styling -->
+<button class="uk-button uk-button-primary">
+<button class="uk-button uk-button-danger uk-button-small">
+
+<!-- Alert styling -->
+<div class="uk-alert-success" uk-alert>
+<div class="uk-alert-danger" uk-alert>
+```
+
+### 2. FontAwesome Icons
+Use FontAwesome icons consistently with UserFrosting patterns:
+
+```vue
+<!-- Standard icons for actions -->
+<font-awesome-icon icon="plus" />          <!-- Create -->
+<font-awesome-icon icon="pen-to-square" /> <!-- Edit -->
+<font-awesome-icon icon="trash" />         <!-- Delete -->
+<font-awesome-icon icon="eye" />           <!-- View -->
+<font-awesome-icon icon="users" />         <!-- Users/Groups -->
+
+<!-- Form field icons -->
+<font-awesome-icon icon="tag" />           <!-- Slug field -->
+<font-awesome-icon icon="envelope" />      <!-- Email field -->
+<font-awesome-icon icon="lock" />          <!-- Locked slug -->
+<font-awesome-icon icon="lock-open" />     <!-- Unlocked slug -->
+
+<!-- Status icons -->
+<font-awesome-icon icon="circle-check" />     <!-- Success -->
+<font-awesome-icon icon="triangle-exclamation" /> <!-- Warning/Error -->
+
+<!-- Always use fixed-width for consistent alignment -->
+<font-awesome-icon icon="icon-name" fixed-width />
+```
 
 1. **Start with schema** - Load and use schema for everything
 2. **Follow admin patterns** - Mirror Group management exactly
