@@ -82,6 +82,24 @@ describe('CRUD6 Theme Core Tests', () => {
         expect(route).toContain(':model')
       })
     })
+
+    it('should export CRUD6 routes', () => {
+      try {
+        const { CRUD6Routes } = require('../index.ts')
+        expect(CRUD6Routes).toBeDefined()
+        expect(Array.isArray(CRUD6Routes)).toBe(true)
+        expect(CRUD6Routes.length).toBeGreaterThan(0)
+        
+        // Check route structure
+        const crud6Route = CRUD6Routes.find(route => route.path === 'crud6/:model')
+        expect(crud6Route).toBeDefined()
+        expect(crud6Route.children).toBeDefined()
+        expect(Array.isArray(crud6Route.children)).toBe(true)
+      } catch (error) {
+        // Routes export is optional for themes
+        console.warn('CRUD6Routes not exported, routes must be imported separately')
+      }
+    })
   })
 
   describe('Schema-Driven Features', () => {

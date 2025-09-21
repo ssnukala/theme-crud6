@@ -30,6 +30,7 @@
         "./components/pages/crud6": "./src/components/Pages/CRUD6/index.ts",
         "./plugins": "./src/plugins/index.ts",
         "./views": "./src/views/index.ts",
+        "./routes": "./src/routes/index.ts",
         "./less/*": "./src/less/*"
     },
     "files": [

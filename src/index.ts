@@ -20,3 +20,6 @@ export default {
         // Nothing to do here for now.
     }
 }
+
+// Export routes so they can be imported separately
+export { default as CRUD6Routes } from './routes'
