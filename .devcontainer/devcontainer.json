@@ -1,0 +1,86 @@
+{
+    "name": "Theme CRUD6 Development (Full Stack)",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "theme-crud6",
+    "workspaceFolder": "/workspace",
+    "shutdownAction": "stopCompose",
+    "containerEnv": {
+        "NODE_ENV": "development",
+        "COMPOSER_ALLOW_SUPERUSER": "1"
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "php.suggest.basic": false,
+                "php.validate.executablePath": "/usr/local/bin/php",
+                "php.debug.executablePath": "/usr/local/bin/php",
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.fixAll": true
+                },
+                "typescript.preferences.quoteStyle": "single",
+                "javascript.preferences.quoteStyle": "single",
+                "editor.defaultFormatter": "esbenp.prettier-vscode",
+                "files.associations": {
+                    "*.twig": "twig"
+                },
+                "emmet.includeLanguages": {
+                    "twig": "html",
+                    "vue": "html"
+                },
+                "vetur.format.defaultFormatter.html": "prettier",
+                "vetur.format.defaultFormatter.js": "prettier",
+                "vetur.format.defaultFormatter.ts": "prettier"
+            },
+            "extensions": [
+                "bmewburn.vscode-intelephense-client",
+                "xdebug.php-debug",
+                "junstyle.php-cs-fixer",
+                "phpstan.phpstan-vscode",
+                "vue.volar",
+                "vue.vscode-typescript-vue-plugin",
+                "esbenp.prettier-vscode",
+                "ms-vscode.vscode-typescript-next",
+                "formulahendry.auto-rename-tag",
+                "bradlc.vscode-tailwindcss",
+                "whatwedo.twig",
+                "mikestead.dotenv",
+                "ms-vscode.vscode-json",
+                "GitHub.copilot",
+                "GitHub.copilot-chat"
+            ]
+        }
+    },
+    "forwardPorts": [
+        8080,
+        5173,
+        3306,
+        9003
+    ],
+    "portsAttributes": {
+        "8080": {
+            "label": "UserFrosting App",
+            "onAutoForward": "notify"
+        },
+        "5173": {
+            "label": "Vite Dev Server (Theme)",
+            "onAutoForward": "openBrowser"
+        },
+        "3306": {
+            "label": "MySQL Database"
+        },
+        "9003": {
+            "label": "XDebug"
+        }
+    },
+    "postCreateCommand": "bash .devcontainer/setup-full-stack.sh",
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=theme-crud6-node_modules,target=/workspace/theme/node_modules,type=volume",
+        "source=theme-crud6-vendor,target=/workspace/userfrosting/vendor,type=volume"
+    ],
+    "features": {
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/devcontainers/features/github-cli:1": {}
+    }
+}

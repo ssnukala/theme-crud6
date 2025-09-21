@@ -1,0 +1,47 @@
+version: '3.8'
+
+services:
+  theme-crud6:
+    build:
+      context: ..
+      dockerfile: .devcontainer/Dockerfile.full-stack
+    volumes:
+      - ..:/workspace:cached
+      - theme-crud6-node_modules:/workspace/theme/node_modules
+      - theme-crud6-vendor:/workspace/userfrosting/vendor
+    ports:
+      - "8080:8080"
+      - "5173:5173"
+      - "9003:9003"
+    environment:
+      - NODE_ENV=development
+      - COMPOSER_ALLOW_SUPERUSER=1
+      - PACKAGE_DIR=/workspace/userfrosting
+      - THEME_DIR=/workspace/theme
+    depends_on:
+      - mysql
+    networks:
+      - theme-crud6-network
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: userfrosting
+      MYSQL_DATABASE: userfrosting
+      MYSQL_USER: userfrosting
+      MYSQL_PASSWORD: userfrosting
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    networks:
+      - theme-crud6-network
+
+volumes:
+  theme-crud6-node_modules:
+  theme-crud6-vendor:
+  mysql-data:
+
+networks:
+  theme-crud6-network:
+    driver: bridge
