@@ -1,43 +1,85 @@
 <script setup lang="ts">
-
-// TODO : Rewrite this to use useCRUD6Schema to get the fields and labels dynamically instead of hardcoding them
-// Need to maintain the compatibility with the Userfrosting 6 features like Sprunjer, Form, Permissions, etc.
-// user userfrosting/sprinkle-admin in that Group as reference
-
-import { watch } from 'vue'
+import { watch, computed, onMounted } from 'vue'
 import { useCRUD6Api } from '@ssnukala/sprinkle-crud6/composables'
-import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
+import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 
 /**
- * Props - Optional group object for editing.
+ * Props - Optional CRUD6 object for editing and model for schema loading
  */
-const props = defineProps<{ crud6?: CRUD6Interface }>()
+const props = defineProps<{ 
+    crud6?: CRUD6Interface
+    model?: string
+}>()
 
 /**
- * API - Use the group edit API.
+ * API - Use the CRUD6 edit API
  */
 const { createRow, updateRow, r$, formData, apiLoading, resetForm, slugLocked } = useCRUD6Api()
 
 /**
- * Watchers - Watch for changes in the group prop and update formData
- * accordingly. Useful when the group prop is updated from the parent component,
+ * Schema - Use the CRUD6 schema composable for dynamic form generation
+ */
+const {
+    schema,
+    loading: schemaLoading,
+    error: schemaError,
+    loadSchema
+} = useCRUD6Schema()
+
+/**
+ * Computed properties for form rendering
+ */
+const editableFields = computed(() => {
+    if (!schema.value?.fields) return {}
+    return Object.fromEntries(
+        Object.entries(schema.value.fields).filter(([key, field]) => field.editable !== false)
+    )
+})
+
+const isLoading = computed(() => apiLoading.value || schemaLoading.value)
+
+/**
+ * Watchers - Watch for changes in the crud6 prop and update formData
+ * accordingly. Useful when the crud6 prop is updated from the parent component,
  * or the modal is reused.
  */
-
- /* TODO : Need to change this to use incoming property that will provide the fields */
 watch(
     () => props.crud6,
     (crud6) => {
-        if (crud6) {
-            formData.value.slug = crud6.slug
-            formData.value.name = crud6.name
-            formData.value.description = crud6.description
-            formData.value.icon = crud6.icon
+        if (crud6 && schema.value?.fields) {
+            // Dynamically populate formData based on schema fields
+            Object.keys(schema.value.fields).forEach(fieldKey => {
+                if (crud6[fieldKey] !== undefined) {
+                    formData.value[fieldKey] = crud6[fieldKey]
+                }
+            })
         }
     },
     { immediate: true }
 )
+
+/**
+ * Load schema when model prop changes
+ */
+watch(
+    () => props.model,
+    (newModel) => {
+        if (newModel) {
+            loadSchema(newModel)
+        }
+    },
+    { immediate: true }
+)
+
+/**
+ * Mount hook - Load schema if model is provided
+ */
+onMounted(() => {
+    if (props.model) {
+        loadSchema(props.model)
+    }
+})
 
 /**
  * Emits
@@ -45,7 +87,7 @@ watch(
 const emits = defineEmits(['success'])
 
 /**
- * Methods - Submit the form to the API and handle the response.
+ * Methods - Submit the form to the API and handle the response
  */
 const submitForm = async () => {
     // Make sure validation is up to date
@@ -62,105 +104,213 @@ const submitForm = async () => {
         })
         .catch(() => {})
 }
-// TODO : Need to change the labels and fields in the template below to be dynamic or use slots
 
+/**
+ * Helper function to get field icon
+ */
+function getFieldIcon(field: any, fieldKey: string): string {
+    if (field.icon) return field.icon
+    
+    // Default icons based on field type or name
+    switch (field.type) {
+        case 'email': return 'envelope'
+        case 'password': return 'lock'
+        case 'date': return 'calendar'
+        case 'datetime': return 'clock'
+        case 'boolean': return 'check-square'
+        case 'number':
+        case 'integer':
+        case 'decimal': return 'hashtag'
+        case 'text': return 'align-left'
+        default:
+            // Icon based on field name
+            if (fieldKey.includes('name')) return 'pen-to-square'
+            if (fieldKey.includes('slug')) return 'tag'
+            if (fieldKey.includes('icon')) return 'icons'
+            if (fieldKey.includes('description')) return 'align-left'
+            return 'pen-to-square'
+    }
+}
 </script>
 
-
 <template>
-    <form v-on:submit.prevent="submitForm()">
+    <!-- Loading state -->
+    <div v-if="schemaLoading" class="uk-text-center uk-padding">
+        <div uk-spinner></div>
+        <p>{{ $t('LOADING') }}</p>
+    </div>
+    
+    <!-- Error state -->
+    <div v-else-if="schemaError" class="uk-alert-danger" uk-alert>
+        <h4>{{ schemaError.title }}</h4>
+        <p>{{ schemaError.description }}</p>
+    </div>
+    
+    <!-- Dynamic form based on schema -->
+    <form v-else-if="schema" v-on:submit.prevent="submitForm()">
         <fieldset class="uk-fieldset uk-form-stacked">
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-stacked-text">{{ $t('CRUD6.NAME') }}</label>
+            <!-- Dynamic fields based on schema -->
+            <div 
+                v-for="[fieldKey, field] in Object.entries(editableFields)" 
+                :key="fieldKey"
+                class="uk-margin">
+                
+                <label class="uk-form-label" :for="fieldKey">
+                    {{ field.label || fieldKey }}
+                    <span v-if="field.required" class="uk-text-danger">*</span>
+                </label>
+                
+                <span v-if="field.description" class="uk-text-meta">{{ field.description }}</span>
+                
                 <div class="uk-inline uk-width-1-1">
-                    <font-awesome-icon class="fa-form-icon" icon="pen-to-square" fixed-width />
-                    <input
-                        class="uk-input"
-                        :class="{ 'uk-form-danger': r$.name.$error }"
-                        type="text"
-                        :placeholder="$t('CRUD6.NAME_EXPLAIN')"
-                        aria-label="Group Name"
-                        data-test="name"
-                        autofocus
-                        tabindex="1"
-                        v-model="formData.name" />
-                    <UFFormValidationError :errors="r$.$errors.name" />
-                </div>
-            </div>
-
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-stacked-text">{{ $t('SLUG') }}</label>
-                <div class="uk-inline uk-width-1-1">
-                    <font-awesome-icon class="fa-form-icon" icon="tag" fixed-width />
+                    <!-- Field icon -->
+                    <font-awesome-icon 
+                        class="fa-form-icon" 
+                        :icon="getFieldIcon(field, fieldKey)" 
+                        fixed-width />
+                    
+                    <!-- Special handling for slug field with lock button -->
                     <button
+                        v-if="fieldKey === 'slug'"
                         class="uk-button uk-button-default uk-form-button"
                         type="button"
                         :uk-tooltip="$t('OVERRIDE')"
                         @click="slugLocked = !slugLocked">
                         <font-awesome-icon fixed-width :icon="slugLocked ? 'lock' : 'lock-open'" />
                     </button>
+                    
+                    <!-- Text input -->
                     <input
+                        v-if="['string', 'email', 'url'].includes(field.type) || !field.type"
+                        :id="fieldKey"
                         class="uk-input"
-                        :class="{ 'uk-form-danger': r$.slug.$error }"
-                        :disabled="slugLocked"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
+                        :type="field.type === 'email' ? 'email' : field.type === 'url' ? 'url' : 'text'"
+                        :placeholder="field.placeholder || field.label || fieldKey"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :required="field.required"
+                        :disabled="fieldKey === 'slug' ? slugLocked : field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- Number input -->
+                    <input
+                        v-else-if="['number', 'integer', 'decimal', 'float'].includes(field.type)"
+                        :id="fieldKey"
+                        class="uk-input"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
+                        type="number"
+                        :placeholder="field.placeholder || field.label || fieldKey"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :required="field.required"
+                        :step="field.type === 'integer' ? '1' : 'any'"
+                        :disabled="field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- Password input -->
+                    <input
+                        v-else-if="field.type === 'password'"
+                        :id="fieldKey"
+                        class="uk-input"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
+                        type="password"
+                        :placeholder="field.placeholder || field.label || fieldKey"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :required="field.required"
+                        :disabled="field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- Date input -->
+                    <input
+                        v-else-if="field.type === 'date'"
+                        :id="fieldKey"
+                        class="uk-input"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
+                        type="date"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :required="field.required"
+                        :disabled="field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- DateTime input -->
+                    <input
+                        v-else-if="field.type === 'datetime'"
+                        :id="fieldKey"
+                        class="uk-input"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
+                        type="datetime-local"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :required="field.required"
+                        :disabled="field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- Textarea for text fields -->
+                    <textarea
+                        v-else-if="field.type === 'text'"
+                        :id="fieldKey"
+                        class="uk-textarea"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
+                        :placeholder="field.placeholder || field.label || fieldKey"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :rows="field.rows || 6"
+                        :required="field.required"
+                        :disabled="field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- Checkbox for boolean fields -->
+                    <label v-else-if="field.type === 'boolean'" class="uk-form-label">
+                        <input
+                            :id="fieldKey"
+                            class="uk-checkbox"
+                            type="checkbox"
+                            :data-test="fieldKey"
+                            :disabled="field.readonly"
+                            v-model="formData[fieldKey]" />
+                        {{ field.label || fieldKey }}
+                    </label>
+                    
+                    <!-- Default text input for unknown types -->
+                    <input
+                        v-else
+                        :id="fieldKey"
+                        class="uk-input"
+                        :class="{ 'uk-form-danger': r$[fieldKey]?.$error }"
                         type="text"
-                        :placeholder="$t('SLUG')"
-                        aria-label="Group Slug"
-                        data-test="slug"
-                        tabindex="2"
-                        v-model="formData.slug" />
-                    <UFFormValidationError :errors="r$.$errors.slug" />
+                        :placeholder="field.placeholder || field.label || fieldKey"
+                        :aria-label="field.label || fieldKey"
+                        :data-test="fieldKey"
+                        :required="field.required"
+                        :disabled="field.readonly"
+                        v-model="formData[fieldKey]" />
+                    
+                    <!-- Validation errors -->
+                    <UFFormValidationError :errors="r$.$errors[fieldKey]" />
                 </div>
             </div>
 
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-stacked-text">{{ $t('CRUD6.ICON') }}</label>
-                <span class="uk-text-meta">{{ $t('CRUD6.ICON_EXPLAIN') }}</span>
-                <div class="uk-inline uk-width-1-1">
-                    <font-awesome-icon
-                        class="fa-form-icon"
-                        :icon="formData.icon"
-                        v-if="formData.icon"
-                        fixed-width />
-                    <input
-                        class="uk-input"
-                        :class="{ 'uk-form-danger': r$.icon.$error }"
-                        type="text"
-                        :placeholder="$t('CRUD6.ICON')"
-                        aria-label="Row Icon"
-                        data-test="icon"
-                        tabindex="3"
-                        v-model="formData.icon" />
-                    <UFFormValidationError :errors="r$.$errors.icon" />
-                </div>
-            </div>
-
-            <div class="uk-margin">
-                <label class="uk-form-label" for="form-stacked-text">{{ $t('DESCRIPTION') }}</label>
-                <textarea
-                    class="uk-textarea"
-                    :class="{ 'uk-form-danger': r$.description.$error }"
-                    placeholder="Row Description"
-                    aria-label="Row Description"
-                    data-test="description"
-                    rows="6"
-                    tabindex="4"
-                    v-model="formData.description" />
-                <UFFormValidationError :errors="r$.$errors.description" />
-            </div>
-
+            <!-- Form actions -->
             <div class="uk-text-right" uk-margin>
                 <button class="uk-button uk-button-default uk-modal-close" type="button">
                     {{ $t('CANCEL') }}
                 </button>
                 <button
                     class="uk-button uk-button-primary"
-                    :disabled="r$.$error || apiLoading"
-                    type="submit"
-                    tabindex="5">
+                    :disabled="r$.$error || isLoading"
+                    type="submit">
+                    <div v-if="isLoading" uk-spinner="ratio: 0.5"></div>
                     {{ $t('SAVE') }}
                 </button>
             </div>
         </fieldset>
     </form>
+    
+    <!-- Fallback for no schema -->
+    <div v-else class="uk-alert-warning" uk-alert>
+        <p>{{ $t('CRUD6.NO_SCHEMA') }}</p>
+    </div>
 </template>
