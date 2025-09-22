@@ -241,23 +241,23 @@ watch([model, recordId], async ([newModel, newId]) => {
                             <div
                                 v-for="[fieldKey, field] in Object.entries(schema.fields)"
                                 :key="fieldKey"
-                                :class="field.width || 'uk-width-1-2'"
-                                v-if="field.editable !== false">
+                                :class="field && field.width || 'uk-width-1-2'"
+                                v-if="field && field.editable !== false">
                                 
                                 <label :for="fieldKey" class="uk-form-label">
-                                    {{ field.label || fieldKey }}
-                                    <span v-if="field.required" class="uk-text-danger">*</span>
+                                    {{ (field && field.label) || fieldKey }}
+                                    <span v-if="field && field.required" class="uk-text-danger">*</span>
                                 </label>
                                 
                                 <!-- Text input -->
                                 <input
-                                    v-if="field.type === 'string' || !field.type"
+                                    v-if="field && (field.type === 'string' || !field.type)"
                                     :id="fieldKey"
                                     v-model="record[fieldKey]"
                                     type="text"
                                     class="uk-input"
-                                    :required="field.required"
-                                    :placeholder="field.placeholder"
+                                    :required="field && field.required"
+                                    :placeholder="field && field.placeholder"
                                 />
                                 
                                 <!-- Number input -->

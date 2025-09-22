@@ -37,7 +37,7 @@ const displayFields = computed(() => {
     if (!schema.value?.fields) return {}
     return Object.fromEntries(
         Object.entries(schema.value.fields).filter(([key, field]) => 
-            field.displayable !== false && key !== 'icon'
+            field && field.displayable !== false && key !== 'icon'
         )
     )
 })

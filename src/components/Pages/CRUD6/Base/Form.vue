@@ -33,7 +33,7 @@ const {
 const editableFields = computed(() => {
     if (!schema.value?.fields) return {}
     return Object.fromEntries(
-        Object.entries(schema.value.fields).filter(([key, field]) => field.editable !== false)
+        Object.entries(schema.value.fields).filter(([key, field]) => field && field.editable !== false)
     )
 })
 

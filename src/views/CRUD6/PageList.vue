@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import CRUD6CreateModal from '../../components/Pages/CRUD6/Base/CreateModal.vue'
@@ -76,6 +76,17 @@ onMounted(() => {
         loadSchema(model.value)
     }
 })
+
+// Watch for model changes and reload schema
+watch(
+    () => model.value,
+    (newModel) => {
+        if (newModel) {
+            loadSchema(newModel)
+        }
+    },
+    { immediate: false }
+)
 </script>
 
 <template>
@@ -109,10 +120,10 @@ onMounted(() => {
                 <UFSprunjeHeader 
                     v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
                     :key="fieldKey"
-                    v-if="field.listable !== false"
+                    v-if="field && field.listable !== false"
                     :sort="fieldKey"
-                    :class="field.width ? `uk-width-${field.width}` : ''">
-                    {{ field.label || fieldKey }}
+                    :class="field && field.width ? `uk-width-${field.width}` : ''">
+                    {{ (field && field.label) || fieldKey }}
                 </UFSprunjeHeader>
                 <UFSprunjeHeader v-if="hasEditPermission || hasDeletePermission">
                     {{ $t('CRUD6.ACTIONS') }}
@@ -124,9 +135,9 @@ onMounted(() => {
                 <UFSprunjeColumn 
                     v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
                     :key="fieldKey"
-                    v-if="field.listable !== false"
-                    :class="field.width ? `uk-width-${field.width}` : ''">
-                    <template v-if="field.type === 'link' || fieldKey === schema.primary_key">
+                    v-if="field && field.listable !== false"
+                    :class="field && field.width ? `uk-width-${field.width}` : ''">
+                    <template v-if="field && (field.type === 'link' || fieldKey === schema.primary_key)">
                         <strong>
                             <RouterLink
                                 :to="{
@@ -141,10 +152,10 @@ onMounted(() => {
                             </RouterLink>
                         </strong>
                     </template>
-                    <template v-else-if="field.type === 'badge'">
+                    <template v-else-if="field && field.type === 'badge'">
                         <span class="uk-badge">{{ row[fieldKey] }}</span>
                     </template>
-                    <template v-else-if="field.type === 'boolean'">
+                    <template v-else-if="field && field.type === 'boolean'">
                         <span :class="row[fieldKey] ? 'uk-text-success' : 'uk-text-danger'">
                             {{ row[fieldKey] ? $t('YES') : $t('NO') }}
                         </span>
