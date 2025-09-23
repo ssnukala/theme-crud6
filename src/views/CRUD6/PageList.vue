@@ -73,7 +73,25 @@ function deleteRecord(record: CRUD6Interface) {
 // Load schema when component mounts or model changes
 onMounted(() => {
     if (model.value) {
-        loadSchema(model.value)
+        loadSchema(model.value).then(() => {
+            console.log('PageList.vue: Schema loaded for model', model.value, ':', schema.value)
+            console.log('PageList.vue: Schema fields:', schema.value?.fields)
+            console.log('PageList.vue: Fields entries:', Object.entries(schema.value?.fields || {}))
+            
+            // Debug each field's listable property
+            Object.entries(schema.value?.fields || {}).forEach(([fieldKey, field]) => {
+                console.log(`Field ${fieldKey}:`, field, `listable: ${field.listable}`)
+            })
+            
+            // Debug template access patterns
+            console.log('DEBUG template access:')
+            console.log('schema:', schema)
+            console.log('schema.value:', schema.value)
+            console.log('schema?.fields:', schema?.fields)
+            console.log('schema.value?.fields:', schema.value?.fields)
+            console.log('Object.entries(schema?.fields || {}):', Object.entries(schema?.fields || {}))
+            console.log('Object.entries(schema.value?.fields || {}):', Object.entries(schema.value?.fields || {}))
+        })
     }
 })
 </script>
@@ -108,9 +126,9 @@ onMounted(() => {
             <template #header>
                 <!-- Dynamic headers based on schema -->
                 <UFSprunjeHeader 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(schema.value?.fields || {})"
                     :key="fieldKey"
-                    v-if="field && field.listable !== false"
+                    v-if="field"
                     :sort="fieldKey"
                     :class="field.width ? `uk-width-${field.width}` : ''">
                     {{ field.label || fieldKey }}
@@ -123,18 +141,18 @@ onMounted(() => {
             <template #body="{ row, sprunjer }">
                 <!-- Dynamic columns based on schema -->
                 <UFSprunjeColumn 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(schema.value?.fields || {})"
                     :key="fieldKey"
-                    v-if="field && field.listable !== false"
+                    v-if="field"
                     :class="field.width ? `uk-width-${field.width}` : ''">
-                    <template v-if="field.type === 'link' || fieldKey === schema.primary_key">
+                    <template v-if="field.type === 'link' || fieldKey === schema.value?.primary_key">
                         <strong>
                             <RouterLink
                                 :to="{
                                     name: 'crud6.view',
                                     params: { 
                                         model: model,
-                                        id: row[schema.primary_key || 'id'] 
+                                        id: row[schema.value?.primary_key || 'id'] 
                                     }
                                 }"
                                 @click="viewRecord(row)">
@@ -170,7 +188,7 @@ onMounted(() => {
                                         name: 'crud6.view',
                                         params: { 
                                             model: model,
-                                            id: row[schema.primary_key || 'id'] 
+                                            id: row[schema.value?.primary_key || 'id'] 
                                         }
                                     }"
                                     @click="viewRecord(row)">
