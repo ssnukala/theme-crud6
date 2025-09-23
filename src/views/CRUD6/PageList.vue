@@ -82,6 +82,15 @@ onMounted(() => {
             Object.entries(schema.value?.fields || {}).forEach(([fieldKey, field]) => {
                 console.log(`Field ${fieldKey}:`, field, `listable: ${field.listable}`)
             })
+            
+            // Debug template access patterns
+            console.log('DEBUG template access:')
+            console.log('schema:', schema)
+            console.log('schema.value:', schema.value)
+            console.log('schema?.fields:', schema?.fields)
+            console.log('schema.value?.fields:', schema.value?.fields)
+            console.log('Object.entries(schema?.fields || {}):', Object.entries(schema?.fields || {}))
+            console.log('Object.entries(schema.value?.fields || {}):', Object.entries(schema.value?.fields || {}))
         })
     }
 })
@@ -117,7 +126,7 @@ onMounted(() => {
             <template #header>
                 <!-- Dynamic headers based on schema -->
                 <UFSprunjeHeader 
-                    v-for="[fieldKey, field] in Object.entries(schema?.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(schema.value?.fields || {})"
                     :key="fieldKey"
                     v-if="field"
                     :sort="fieldKey"
@@ -132,18 +141,18 @@ onMounted(() => {
             <template #body="{ row, sprunjer }">
                 <!-- Dynamic columns based on schema -->
                 <UFSprunjeColumn 
-                    v-for="[fieldKey, field] in Object.entries(schema?.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(schema.value?.fields || {})"
                     :key="fieldKey"
                     v-if="field"
                     :class="field.width ? `uk-width-${field.width}` : ''">
-                    <template v-if="field.type === 'link' || fieldKey === schema?.primary_key">
+                    <template v-if="field.type === 'link' || fieldKey === schema.value?.primary_key">
                         <strong>
                             <RouterLink
                                 :to="{
                                     name: 'crud6.view',
                                     params: { 
                                         model: model,
-                                        id: row[schema?.primary_key || 'id'] 
+                                        id: row[schema.value?.primary_key || 'id'] 
                                     }
                                 }"
                                 @click="viewRecord(row)">
@@ -179,7 +188,7 @@ onMounted(() => {
                                         name: 'crud6.view',
                                         params: { 
                                             model: model,
-                                            id: row[schema?.primary_key || 'id'] 
+                                            id: row[schema.value?.primary_key || 'id'] 
                                         }
                                     }"
                                     @click="viewRecord(row)">
