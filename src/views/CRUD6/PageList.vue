@@ -5,7 +5,7 @@ import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import CRUD6CreateModal from '../../components/Pages/CRUD6/Base/CreateModal.vue'
 import CRUD6EditModal from '../../components/Pages/CRUD6/Base/EditModal.vue'
 import CRUD6DeleteModal from '../../components/Pages/CRUD6/Base/DeleteModal.vue'
-import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
+import type { CRUD6Interface, CRUD6Field } from '@ssnukala/sprinkle-crud6/interfaces'
 
 const route = useRoute()
 const router = useRouter()
@@ -76,6 +76,10 @@ onMounted(() => {
         loadSchema(model.value)
     }
 })
+
+// Fields type for schema
+type FieldsType = Record<string, CRUD6Field>
+const fields = computed(() => schema.value?.fields as FieldsType || {})
 </script>
 
 <template>
@@ -97,6 +101,9 @@ onMounted(() => {
             v-else-if="schema" 
             :dataUrl="apiUrl" 
             :searchColumn="searchColumn">
+            <!-- print the schema in the console log -->
+            {{ console.log('Line 101 Loaded schema:', schema) }}
+
             <template #actions="{ sprunjer }">
                 <CRUD6CreateModal
                     @saved="sprunjer.fetch()"
@@ -107,12 +114,12 @@ onMounted(() => {
             <template #header>
                 <!-- Dynamic headers based on schema -->
                 <UFSprunjeHeader 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(fields)"
                     :key="fieldKey"
-                    v-if="field.listable !== false"
+                    v-if="field && field.listable !== false"
                     :sort="fieldKey"
-                    :class="field.width ? `uk-width-${field.width}` : ''">
-                    {{ field.label || fieldKey }}
+                    :class="field && field.width ? `uk-width-${field.width}` : ''">
+                    {{ field && field.label ? field.label : fieldKey }}
                 </UFSprunjeHeader>
                 <UFSprunjeHeader v-if="hasEditPermission || hasDeletePermission">
                     {{ $t('CRUD6.ACTIONS') }}
@@ -122,10 +129,10 @@ onMounted(() => {
             <template #body="{ row, sprunjer }">
                 <!-- Dynamic columns based on schema -->
                 <UFSprunjeColumn 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(fields)"
                     :key="fieldKey"
-                    v-if="field.listable !== false"
-                    :class="field.width ? `uk-width-${field.width}` : ''">
+                    v-if="field && field.listable !== false"
+                    :class="field && field.width ? `uk-width-${field.width}` : ''">
                     <template v-if="field.type === 'link' || fieldKey === schema.primary_key">
                         <strong>
                             <RouterLink
