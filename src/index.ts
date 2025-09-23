@@ -1,9 +1,6 @@
 import type { App } from 'vue'
 
 import CRUD6Sprinkle from './plugins/crud6'
-
-// Export composables for external use
-export * from './composables'
 /**
  * Import UIkit and its icons.
  */

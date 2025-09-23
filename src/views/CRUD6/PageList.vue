@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useCRUD6Schema } from '../../composables'
+import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import CRUD6CreateModal from '../../components/Pages/CRUD6/Base/CreateModal.vue'
 import CRUD6EditModal from '../../components/Pages/CRUD6/Base/EditModal.vue'
 import CRUD6DeleteModal from '../../components/Pages/CRUD6/Base/DeleteModal.vue'
@@ -97,6 +97,7 @@ onMounted(() => {
             v-else-if="schema" 
             :dataUrl="apiUrl" 
             :searchColumn="searchColumn">
+            <!-- print the schema in the console log -->
             <template #actions="{ sprunjer }">
                 <CRUD6CreateModal
                     @saved="sprunjer.fetch()"
