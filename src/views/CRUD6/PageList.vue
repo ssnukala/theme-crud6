@@ -73,7 +73,11 @@ function deleteRecord(record: CRUD6Interface) {
 // Load schema when component mounts or model changes
 onMounted(() => {
     if (model.value) {
-        loadSchema(model.value)
+        loadSchema(model.value).then(() => {
+            console.log('PageList.vue: Schema loaded for model', model.value, ':', schema.value)
+            console.log('PageList.vue: Schema fields:', schema.value?.fields)
+            console.log('PageList.vue: Fields entries:', Object.entries(schema.value?.fields || {}))
+        })
     }
 })
 </script>
@@ -108,9 +112,9 @@ onMounted(() => {
             <template #header>
                 <!-- Dynamic headers based on schema -->
                 <UFSprunjeHeader 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(schema?.fields || {})"
                     :key="fieldKey"
-                    v-if="field && field.listable !== false"
+                    v-if="field && typeof field === 'object' && field.listable !== false"
                     :sort="fieldKey"
                     :class="field.width ? `uk-width-${field.width}` : ''">
                     {{ field.label || fieldKey }}
@@ -123,18 +127,18 @@ onMounted(() => {
             <template #body="{ row, sprunjer }">
                 <!-- Dynamic columns based on schema -->
                 <UFSprunjeColumn 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(schema?.fields || {})"
                     :key="fieldKey"
-                    v-if="field && field.listable !== false"
+                    v-if="field && typeof field === 'object' && field.listable !== false"
                     :class="field.width ? `uk-width-${field.width}` : ''">
-                    <template v-if="field.type === 'link' || fieldKey === schema.primary_key">
+                    <template v-if="field.type === 'link' || fieldKey === schema?.primary_key">
                         <strong>
                             <RouterLink
                                 :to="{
                                     name: 'crud6.view',
                                     params: { 
                                         model: model,
-                                        id: row[schema.primary_key || 'id'] 
+                                        id: row[schema?.primary_key || 'id'] 
                                     }
                                 }"
                                 @click="viewRecord(row)">
@@ -170,7 +174,7 @@ onMounted(() => {
                                         name: 'crud6.view',
                                         params: { 
                                             model: model,
-                                            id: row[schema.primary_key || 'id'] 
+                                            id: row[schema?.primary_key || 'id'] 
                                         }
                                     }"
                                     @click="viewRecord(row)">
