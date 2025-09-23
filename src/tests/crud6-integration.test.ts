@@ -17,6 +17,7 @@ vi.mock('@ssnukala/sprinkle-crud6/composables', () => ({
           name: { type: 'string', listable: true, searchable: true, label: 'Name' },
           slug: { type: 'string', listable: true, label: 'Slug' },
           description: { type: 'text', listable: true, label: 'Description' },
+          icon: { type: 'string', listable: false, label: 'Icon' },
           users_count: { type: 'integer', listable: true, label: 'Users' },
           enabled: { type: 'boolean', listable: true, label: 'Status' },
           created_at: { type: 'datetime', listable: true, label: 'Created' }
@@ -103,6 +104,35 @@ describe('CRUD6 Theme Integration Tests', () => {
 
       // Component should be reactive to route.params.model
       expect(wrapper.vm.model).toBe('groups')
+    })
+
+    it('should filter fields based on listable property', async () => {
+      mockRouter.push('/crud6/groups')
+      await mockRouter.isReady()
+
+      const wrapper = mount(CRUD6ListPage, {
+        global: {
+          plugins: [mockRouter, mockPinia],
+          mocks: {
+            $t: (key) => key,
+            $checkAccess: () => true
+          }
+        }
+      })
+
+      // Should only include listable fields (icon field should be excluded)
+      const listableFields = wrapper.vm.listableFields
+      expect(listableFields).toBeDefined()
+      expect(listableFields.id).toBeDefined()
+      expect(listableFields.name).toBeDefined()
+      expect(listableFields.slug).toBeDefined()
+      expect(listableFields.description).toBeDefined()
+      expect(listableFields.users_count).toBeDefined()
+      expect(listableFields.enabled).toBeDefined()
+      expect(listableFields.created_at).toBeDefined()
+      
+      // Icon field should not be included since listable: false
+      expect(listableFields.icon).toBeUndefined()
     })
   })
 

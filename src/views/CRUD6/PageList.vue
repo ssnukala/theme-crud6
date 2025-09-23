@@ -29,6 +29,14 @@ const hasCreatePermission = computed(() => hasPermission('create'))
 const hasEditPermission = computed(() => hasPermission('update'))
 const hasDeletePermission = computed(() => hasPermission('delete'))
 
+// Schema-driven field filtering
+const listableFields = computed(() => {
+    if (!schema.value?.fields) return {}
+    return Object.fromEntries(
+        Object.entries(schema.value.fields).filter(([key, field]) => field.listable !== false)
+    )
+})
+
 // Dynamic API URL based on model
 const apiUrl = computed(() => model.value ? `/api/crud6/${model.value}` : '/api/groups')
 
@@ -73,25 +81,7 @@ function deleteRecord(record: CRUD6Interface) {
 // Load schema when component mounts or model changes
 onMounted(() => {
     if (model.value) {
-        loadSchema(model.value).then(() => {
-            console.log('PageList.vue: Schema loaded for model', model.value, ':', schema.value)
-            console.log('PageList.vue: Schema fields:', schema.value?.fields)
-            console.log('PageList.vue: Fields entries:', Object.entries(schema.value?.fields || {}))
-            
-            // Debug each field's listable property
-            Object.entries(schema.value?.fields || {}).forEach(([fieldKey, field]) => {
-                console.log(`Field ${fieldKey}:`, field, `listable: ${field.listable}`)
-            })
-            
-            // Debug template access patterns
-            console.log('DEBUG template access:')
-            console.log('schema:', schema)
-            console.log('schema.value:', schema.value)
-            console.log('schema?.fields:', schema?.fields)
-            console.log('schema.value?.fields:', schema.value?.fields)
-            console.log('Object.entries(schema?.fields || {}):', Object.entries(schema?.fields || {}))
-            console.log('Object.entries(schema.value?.fields || {}):', Object.entries(schema.value?.fields || {}))
-        })
+        loadSchema(model.value)
     }
 })
 </script>
@@ -126,9 +116,8 @@ onMounted(() => {
             <template #header>
                 <!-- Dynamic headers based on schema -->
                 <UFSprunjeHeader 
-                    v-for="[fieldKey, field] in Object.entries(schema.value?.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(listableFields)"
                     :key="fieldKey"
-                    v-if="field"
                     :sort="fieldKey"
                     :class="field.width ? `uk-width-${field.width}` : ''">
                     {{ field.label || fieldKey }}
@@ -141,9 +130,8 @@ onMounted(() => {
             <template #body="{ row, sprunjer }">
                 <!-- Dynamic columns based on schema -->
                 <UFSprunjeColumn 
-                    v-for="[fieldKey, field] in Object.entries(schema.value?.fields || {})"
+                    v-for="[fieldKey, field] in Object.entries(listableFields)"
                     :key="fieldKey"
-                    v-if="field"
                     :class="field.width ? `uk-width-${field.width}` : ''">
                     <template v-if="field.type === 'link' || fieldKey === schema.value?.primary_key">
                         <strong>
