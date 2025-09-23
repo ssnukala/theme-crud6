@@ -1,3 +1,4 @@
+<!-- PageList.vue -->
 <script setup lang="ts">
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -10,194 +11,160 @@ import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 const route = useRoute()
 const router = useRouter()
 
-// Get model from route parameter
+// Current model name from route
 const model = computed(() => route.params.model as string)
 
-// Use schema composable for dynamic schema loading
+// CRUD6 schema composable
 const {
-    schema,
-    loading: schemaLoading,
-    error: schemaError,
-    loadSchema,
-    hasPermission,
-    tableColumns,
-    defaultSort
+  schema,
+  loading: schemaLoading,
+  error: schemaError,
+  loadSchema,
+  hasPermission,
 } = useCRUD6Schema()
 
-// Permission checks
+// Permissions
 const hasCreatePermission = computed(() => hasPermission('create'))
-const hasEditPermission = computed(() => hasPermission('update'))
+const hasEditPermission   = computed(() => hasPermission('update'))
 const hasDeletePermission = computed(() => hasPermission('delete'))
 
-// Dynamic API URL based on model
-const apiUrl = computed(() => model.value ? `/api/crud6/${model.value}` : '/api/groups')
+// Schema fields
+const schemaFields = computed(() => Object.entries(schema.value?.fields || {}))
 
-// Dynamic search column from schema or fallback
+// API URL
+const apiUrl = computed(() =>
+  model.value ? `/api/crud6/${model.value}` : '/api/groups'
+)
+
+// Search column
 const searchColumn = computed(() => {
-    if (schema.value?.fields) {
-        // Find first searchable field or fallback to 'name'
-        const searchableField = Object.keys(schema.value.fields).find(key => 
-            schema.value.fields[key].searchable
-        )
-        return searchableField || 'name'
-    }
-    return 'name'
+  const fields = schema.value?.fields
+  if (fields) {
+    const searchable = Object.keys(fields).find(key => fields[key].searchable)
+    return searchable || 'name'
+  }
+  return 'name'
 })
 
 // Actions
-function createNew() {
-    if (model.value) {
-        router.push(`/crud6/${model.value}/create`)
-    }
-}
-
-function editRecord(record: CRUD6Interface) {
-    if (model.value && record) {
-        const id = record[schema.value?.primary_key || 'id']
-        router.push(`/crud6/${model.value}/${id}/edit`)
-    }
-}
-
 function viewRecord(record: CRUD6Interface) {
-    if (model.value && record) {
-        const id = record[schema.value?.primary_key || 'id']
-        router.push(`/crud6/${model.value}/${id}`)
-    }
+  if (model.value && record) {
+    const id = record[schema.value?.primary_key || 'id']
+    router.push(`/crud6/${model.value}/${id}`)
+  }
 }
 
-function deleteRecord(record: CRUD6Interface) {
-    // Delete functionality handled by CRUD6DeleteModal component
-    console.log('Delete record:', record)
-}
-
-// Load schema when component mounts or model changes
+// Load schema
 onMounted(() => {
-    if (model.value) {
-        loadSchema(model.value)
-    }
+  if (model.value) {
+    loadSchema(model.value).then(() => {
+      console.log('Line 61 : Schema loaded:', schema.value)
+    })
+  }
 })
 </script>
 
 <template>
-    <UFCardBox>
-        <!-- Loading state -->
-        <div v-if="schemaLoading" class="uk-text-center uk-padding">
-            <div uk-spinner></div>
-            <p>{{ $t('LOADING') }}</p>
-        </div>
-        
-        <!-- Error state -->
-        <div v-else-if="schemaError" class="uk-alert-danger" uk-alert>
-            <h4>{{ schemaError.title }}</h4>
-            <p>{{ schemaError.description }}</p>
-        </div>
-        
-        <!-- Dynamic Table with Schema -->
-        <UFSprunjeTable 
-            v-else-if="schema" 
-            :dataUrl="apiUrl" 
-            :searchColumn="searchColumn">
-            <!-- print the schema in the console log -->
-            <template #actions="{ sprunjer }">
-                <CRUD6CreateModal
-                    @saved="sprunjer.fetch()"
-                    class="uk-button uk-button-primary"
-                    v-if="hasCreatePermission" />
-            </template>
+  <UFCardBox>
+    <!-- Loading -->
+    <div v-if="schemaLoading" class="uk-text-center uk-padding">
+      <div uk-spinner></div>
+      <p>{{ $t('LOADING') }}</p>
+    </div>
 
-            <template #header>
-                <!-- Dynamic headers based on schema -->
-                <UFSprunjeHeader 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
-                    :key="fieldKey"
-                    v-if="field && field.listable !== false"
-                    :sort="fieldKey"
-                    :class="field.width ? `uk-width-${field.width}` : ''">
-                    {{ field.label || fieldKey }}
-                </UFSprunjeHeader>
-                <UFSprunjeHeader v-if="hasEditPermission || hasDeletePermission">
-                    {{ $t('CRUD6.ACTIONS') }}
-                </UFSprunjeHeader>
-            </template>
+    <!-- Error -->
+    <div v-else-if="schemaError" class="uk-alert-danger" uk-alert>
+      <h4>{{ schemaError.title }}</h4>
+      <p>{{ schemaError.description }}</p>
+    </div>
 
-            <template #body="{ row, sprunjer }">
-                <!-- Dynamic columns based on schema -->
-                <UFSprunjeColumn 
-                    v-for="[fieldKey, field] in Object.entries(schema.fields || {})"
-                    :key="fieldKey"
-                    v-if="field && field.listable !== false"
-                    :class="field.width ? `uk-width-${field.width}` : ''">
-                    <template v-if="field.type === 'link' || fieldKey === schema.primary_key">
-                        <strong>
-                            <RouterLink
-                                :to="{
-                                    name: 'crud6.view',
-                                    params: { 
-                                        model: model,
-                                        id: row[schema.primary_key || 'id'] 
-                                    }
-                                }"
-                                @click="viewRecord(row)">
-                                {{ row[fieldKey] }}
-                            </RouterLink>
-                        </strong>
-                    </template>
-                    <template v-else-if="field.type === 'badge'">
-                        <span class="uk-badge">{{ row[fieldKey] }}</span>
-                    </template>
-                    <template v-else-if="field.type === 'boolean'">
-                        <span :class="row[fieldKey] ? 'uk-text-success' : 'uk-text-danger'">
-                            {{ row[fieldKey] ? $t('YES') : $t('NO') }}
-                        </span>
-                    </template>
-                    <template v-else>
-                        {{ row[fieldKey] }}
-                    </template>
-                </UFSprunjeColumn>
-                
-                <!-- Actions column -->
-                <UFSprunjeColumn v-if="hasEditPermission || hasDeletePermission">
-                    <button class="uk-button uk-button-primary uk-text-nowrap" type="button">
-                        {{ $t('ACTIONS') }} <span uk-drop-parent-icon></span>
-                    </button>
-                    <div
-                        class="uk-padding-small"
-                        uk-dropdown="pos: bottom-right; mode: click; offset: 2">
-                        <ul class="uk-nav uk-dropdown-nav">
-                            <li>
-                                <RouterLink
-                                    :to="{
-                                        name: 'crud6.view',
-                                        params: { 
-                                            model: model,
-                                            id: row[schema.primary_key || 'id'] 
-                                        }
-                                    }"
-                                    @click="viewRecord(row)">
-                                    <font-awesome-icon icon="eye" fixed-width /> View
-                                </RouterLink>
-                            </li>
-                            <li v-if="hasEditPermission">
-                                <CRUD6EditModal
-                                    :crud6="row"
-                                    @saved="sprunjer.fetch()"
-                                    class="uk-drop-close" />
-                            </li>
-                            <li v-if="hasDeletePermission">
-                                <CRUD6DeleteModal
-                                    :crud6="row"
-                                    @deleted="sprunjer.fetch()"
-                                    class="uk-drop-close" />
-                            </li>
-                        </ul>
-                    </div>
-                </UFSprunjeColumn>
-            </template>
-        </UFSprunjeTable>
-        
-        <!-- Fallback for no schema -->
-        <div v-else class="uk-alert-warning" uk-alert>
-            <p>{{ $t('CRUD6.NO_SCHEMA') }}</p>
-        </div>
-    </UFCardBox>
+    <!-- Table -->
+    <UFSprunjeTable
+      v-else-if="schema"
+      :dataUrl="apiUrl"
+      :searchColumn="searchColumn">
+
+      <!-- Actions -->
+      <template #actions="{ sprunjer }">
+        <CRUD6CreateModal
+          v-if="hasCreatePermission"
+          @saved="sprunjer.fetch()"
+          class="uk-button uk-button-primary" />
+      </template>
+
+      <!-- Header -->
+      <template #header>
+        <UFSprunjeHeader
+          v-for="[fieldKey, field] in schemaFields"
+          :key="fieldKey"
+          :sort="fieldKey"
+          :class="field.width ? `uk-width-${field.width}` : ''">
+          {{ field.label || fieldKey }}
+        </UFSprunjeHeader>
+        <UFSprunjeHeader v-if="hasEditPermission || hasDeletePermission">
+          {{ $t('CRUD6.ACTIONS') }}
+        </UFSprunjeHeader>
+      </template>
+
+      <!-- Body -->
+      <template #body="{ row, sprunjer }">
+        <UFSprunjeColumn
+          v-for="[fieldKey, field] in schemaFields"
+          :key="fieldKey"
+          :class="field.width ? `uk-width-${field.width}` : ''">
+          
+          <!-- Field rendering -->
+          <template v-if="field.type === 'link' || fieldKey === schema.value?.primary_key">
+            <strong>
+              <RouterLink
+                :to="{ name: 'crud6.view', params: { model: model, id: row[schema.value?.primary_key || 'id'] } }"
+                @click="viewRecord(row)">
+                {{ row[fieldKey] }}
+              </RouterLink>
+            </strong>
+          </template>
+          <template v-else-if="field.type === 'badge'">
+            <span class="uk-badge">{{ row[fieldKey] }}</span>
+          </template>
+          <template v-else-if="field.type === 'boolean'">
+            <span :class="row[fieldKey] ? 'uk-text-success' : 'uk-text-danger'">
+              {{ row[fieldKey] ? $t('YES') : $t('NO') }}
+            </span>
+          </template>
+          <template v-else>
+            {{ row[fieldKey] }}
+          </template>
+        </UFSprunjeColumn>
+
+        <!-- Action column -->
+        <UFSprunjeColumn v-if="hasEditPermission || hasDeletePermission">
+          <button class="uk-button uk-button-primary uk-text-nowrap" type="button">
+            {{ $t('ACTIONS') }} <span uk-drop-parent-icon></span>
+          </button>
+          <div class="uk-padding-small" uk-dropdown="pos: bottom-right; mode: click; offset: 2">
+            <ul class="uk-nav uk-dropdown-nav">
+              <li>
+                <RouterLink
+                  :to="{ name: 'crud6.view', params: { model: model, id: row[schema.value?.primary_key || 'id'] } }"
+                  @click="viewRecord(row)">
+                  <font-awesome-icon icon="eye" fixed-width /> View
+                </RouterLink>
+              </li>
+              <li v-if="hasEditPermission">
+                <CRUD6EditModal :crud6="row" @saved="sprunjer.fetch()" class="uk-drop-close" />
+              </li>
+              <li v-if="hasDeletePermission">
+                <CRUD6DeleteModal :crud6="row" @deleted="sprunjer.fetch()" class="uk-drop-close" />
+              </li>
+            </ul>
+          </div>
+        </UFSprunjeColumn>
+      </template>
+    </UFSprunjeTable>
+
+    <!-- No schema -->
+    <div v-else class="uk-alert-warning" uk-alert>
+      <p>{{ $t('CRUD6.NO_SCHEMA') }}</p>
+    </div>
+  </UFCardBox>
 </template>
