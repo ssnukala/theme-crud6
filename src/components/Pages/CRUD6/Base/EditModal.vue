@@ -4,10 +4,11 @@ import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 import CRUD6Form from './Form.vue'
 
 /**
- * Props - The CRUD6 object to edit.
+ * Props - The CRUD6 object to edit and model for schema loading.
  */
 const props = defineProps<{
     crud6: CRUD6Interface
+    model?: string
 }>()
 
 /**
@@ -34,7 +35,7 @@ const formSuccess = () => {
     <UFModal :id="'modal-crud6-edit-' + props.crud6.id" closable>
         <template #header> {{ $t('CRUD6.EDIT') }} </template>
         <template #default>
-            <CRUD6Form :crud6="props.crud6" @success="formSuccess()" />
+            <CRUD6Form :crud6="props.crud6" :model="props.model" @success="formSuccess()" />
         </template>
     </UFModal>
 </template>

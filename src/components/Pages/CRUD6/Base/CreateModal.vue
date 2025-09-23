@@ -3,6 +3,13 @@ import UIkit from 'uikit'
 import CRUD6Form from './Form.vue'
 
 /**
+ * Props - Model for schema loading.
+ */
+const props = defineProps<{
+    model?: string
+}>()
+
+/**
  * Emits - Define the saved event. This event is emitted when the form is saved
  * to notify the parent component to refresh the data.
  */
@@ -26,7 +33,7 @@ const formSuccess = () => {
     <UFModal id="modal-crud6-create" closable>
         <template #header>{{ $t('CRUD6.CREATE') }}</template>
         <template #default>
-            <CRUD6Form @success="formSuccess()" />
+            <CRUD6Form :model="props.model" @success="formSuccess()" />
         </template>
     </UFModal>
 </template>
