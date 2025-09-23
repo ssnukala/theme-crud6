@@ -28,6 +28,7 @@
         ".": "./src/index.ts",
         "./components": "./src/components/index.ts",
         "./components/pages/crud6": "./src/components/Pages/CRUD6/index.ts",
+        "./composables": "./src/composables/index.ts",
         "./plugins": "./src/plugins/index.ts",
         "./views": "./src/views/index.ts",
         "./less/*": "./src/less/*"

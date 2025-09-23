@@ -1,0 +1,1 @@
+export { useCRUD6Schema } from './useCRUD6Schema'

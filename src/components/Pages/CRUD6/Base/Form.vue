@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { watch, computed, onMounted } from 'vue'
 import { useCRUD6Api } from '@ssnukala/sprinkle-crud6/composables'
-import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
+import { useCRUD6Schema } from '../../../../composables'
 import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 
 /**
