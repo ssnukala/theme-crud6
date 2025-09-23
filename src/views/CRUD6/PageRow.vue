@@ -71,13 +71,18 @@ const hasViewPermission = computed(() => hasPermission('view'))
  * Methods - Fetch record
  */
 function fetch() {
-    if (recordId.value) {
-        fetchCRUD6Row(recordId.value).then((fetchedRow) => {
-            CRUD6Row.value = fetchedRow
-            record.value = fetchedRow
-            originalRecord.value = { ...fetchedRow }
-            page.title = CRUD6Row.value.name
-        })
+    if (recordId.value && fetchCRUD6Row) {
+        const fetchPromise = fetchCRUD6Row(recordId.value)
+        if (fetchPromise && typeof fetchPromise.then === 'function') {
+            fetchPromise.then((fetchedRow) => {
+                CRUD6Row.value = fetchedRow
+                record.value = fetchedRow
+                originalRecord.value = { ...fetchedRow }
+                page.title = CRUD6Row.value.name
+            }).catch((error) => {
+                console.error('Failed to fetch CRUD6 row:', error)
+            })
+        }
     }
 }
 
@@ -178,11 +183,18 @@ watch(
 
 // Watch for route changes
 watch([model, recordId], async ([newModel, newId]) => {
-    if (newModel) {
-        await loadSchema(newModel)
-        
-        if (newId && !isCreateMode.value) {
-            fetch()
+    if (newModel && loadSchema) {
+        try {
+            const schemaPromise = loadSchema(newModel)
+            if (schemaPromise && typeof schemaPromise.then === 'function') {
+                await schemaPromise
+            }
+            
+            if (newId && !isCreateMode.value) {
+                fetch()
+            }
+        } catch (error) {
+            console.error('Failed to load schema in route watcher:', error)
         }
     }
 })

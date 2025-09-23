@@ -65,8 +65,13 @@ watch(
 watch(
     () => props.model,
     (newModel) => {
-        if (newModel) {
-            loadSchema(newModel)
+        if (newModel && loadSchema) {
+            const schemaPromise = loadSchema(newModel)
+            if (schemaPromise && typeof schemaPromise.then === 'function') {
+                schemaPromise.catch((error) => {
+                    console.error('Failed to load schema in watcher:', error)
+                })
+            }
         }
     },
     { immediate: true }
@@ -76,8 +81,13 @@ watch(
  * Mount hook - Load schema if model is provided
  */
 onMounted(() => {
-    if (props.model) {
-        loadSchema(props.model)
+    if (props.model && loadSchema) {
+        const schemaPromise = loadSchema(props.model)
+        if (schemaPromise && typeof schemaPromise.then === 'function') {
+            schemaPromise.catch((error) => {
+                console.error('Failed to load schema on mount:', error)
+            })
+        }
     }
 })
 
