@@ -77,6 +77,11 @@ onMounted(() => {
             console.log('PageList.vue: Schema loaded for model', model.value, ':', schema.value)
             console.log('PageList.vue: Schema fields:', schema.value?.fields)
             console.log('PageList.vue: Fields entries:', Object.entries(schema.value?.fields || {}))
+            
+            // Debug each field's listable property
+            Object.entries(schema.value?.fields || {}).forEach(([fieldKey, field]) => {
+                console.log(`Field ${fieldKey}:`, field, `listable: ${field.listable}`)
+            })
         })
     }
 })
@@ -114,7 +119,7 @@ onMounted(() => {
                 <UFSprunjeHeader 
                     v-for="[fieldKey, field] in Object.entries(schema?.fields || {})"
                     :key="fieldKey"
-                    v-if="field && typeof field === 'object' && field.listable !== false"
+                    v-if="field"
                     :sort="fieldKey"
                     :class="field.width ? `uk-width-${field.width}` : ''">
                     {{ field.label || fieldKey }}
@@ -129,7 +134,7 @@ onMounted(() => {
                 <UFSprunjeColumn 
                     v-for="[fieldKey, field] in Object.entries(schema?.fields || {})"
                     :key="fieldKey"
-                    v-if="field && typeof field === 'object' && field.listable !== false"
+                    v-if="field"
                     :class="field.width ? `uk-width-${field.width}` : ''">
                     <template v-if="field.type === 'link' || fieldKey === schema?.primary_key">
                         <strong>
