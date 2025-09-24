@@ -75,9 +75,9 @@ function fetch() {
         const fetchPromise = fetchCRUD6Row(recordId.value)
         if (fetchPromise && typeof fetchPromise.then === 'function') {
             fetchPromise.then((fetchedRow) => {
-                CRUD6Row.value = fetchedRow
-                record.value = fetchedRow
-                originalRecord.value = { ...fetchedRow }
+                CRUD6Row.value = fetchedRow.data
+                record.value = fetchedRow.data
+                originalRecord.value = { ...fetchedRow.data }
                 page.title = CRUD6Row.value.name
             }).catch((error) => {
                 console.error('Failed to fetch CRUD6 row:', error)

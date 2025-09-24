@@ -33,7 +33,7 @@ const schemaFields = computed(() => Object.entries(schema.value?.fields || {}))
 
 // API URL
 const apiUrl = computed(() =>
-  model.value ? `/api/crud6/${model.value}` : '/api/groups'
+  model.value ? `/api/crud6/${model.value}` : '/api/crud6/model-not-set'
 )
 
 // Search column

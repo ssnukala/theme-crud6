@@ -153,7 +153,7 @@ onMounted(() => {
             <CRUD6DeleteModal
                 :crud6="crud6"
                 :model="model"
-                @deleted="router.push({ name: 'crud6-list', params: { model: model } })"
+                @deleted="router.push({ name: 'crud6.list', params: { model: model } })"
                 v-if="hasDeletePermission"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small" />
             
@@ -185,7 +185,7 @@ onMounted(() => {
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             <CRUD6DeleteModal
                 :crud6="crud6"
-                @deleted="router.push({ name: 'admin.groups' })"
+                @deleted="router.push({ name: 'crud6.list' })"
                 v-if="$checkAccess('delete_crud6_row')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small" />
             <slot data-test="slot"></slot>

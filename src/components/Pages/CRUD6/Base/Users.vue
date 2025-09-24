@@ -9,7 +9,7 @@ const { slug } = defineProps<{
 <template>
     <UFCardBox title="GROUP.USERS">
         <UFSprunjeTable
-            :dataUrl="'/api/groups/g/' + slug + '/users'"
+            :dataUrl="'/api/crud6/groups/' + slug + '/users'"
             searchColumn="name"
             hideFilters>
             <template #header>
