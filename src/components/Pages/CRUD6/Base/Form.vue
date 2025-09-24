@@ -5,11 +5,12 @@ import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import type { CRUD6Interface } from '@ssnukala/sprinkle-crud6/interfaces'
 
 /**
- * Props - Optional CRUD6 object for editing and model for schema loading
+ * Props - Optional CRUD6 object for editing, model for schema loading, and optional schema to avoid duplicate loads
  */
 const props = defineProps<{ 
     crud6?: CRUD6Interface
     model?: string
+    schema?: any
 }>()
 
 /**
@@ -18,14 +19,17 @@ const props = defineProps<{
 const { createRow, updateRow, r$, formData, apiLoading, resetForm, slugLocked } = useCRUD6Api()
 
 /**
- * Schema - Use the CRUD6 schema composable for dynamic form generation
+ * Schema - Use the CRUD6 schema composable for dynamic form generation or use provided schema
  */
 const {
-    schema,
+    schema: composableSchema,
     loading: schemaLoading,
     error: schemaError,
     loadSchema
 } = useCRUD6Schema()
+
+// Use provided schema or fallback to composable schema
+const schema = computed(() => props.schema || composableSchema.value)
 
 /**
  * Computed properties for form rendering
@@ -37,7 +41,7 @@ const editableFields = computed(() => {
     )
 })
 
-const isLoading = computed(() => apiLoading.value || schemaLoading.value)
+const isLoading = computed(() => apiLoading.value || (!props.schema && schemaLoading.value))
 
 /**
  * Watchers - Watch for changes in the crud6 prop and update formData
@@ -60,12 +64,12 @@ watch(
 )
 
 /**
- * Load schema when model prop changes
+ * Load schema when model prop changes (only if schema not provided as prop)
  */
 watch(
     () => props.model,
     (newModel) => {
-        if (newModel && loadSchema) {
+        if (newModel && loadSchema && !props.schema) {
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 schemaPromise.catch((error) => {
@@ -78,10 +82,10 @@ watch(
 )
 
 /**
- * Mount hook - Load schema if model is provided
+ * Mount hook - Load schema if model is provided and schema not provided as prop
  */
 onMounted(() => {
-    if (props.model && loadSchema) {
+    if (props.model && loadSchema && !props.schema) {
         const schemaPromise = loadSchema(props.model)
         if (schemaPromise && typeof schemaPromise.then === 'function') {
             schemaPromise.catch((error) => {
@@ -144,14 +148,14 @@ function getFieldIcon(field: any, fieldKey: string): string {
 </script>
 
 <template>
-    <!-- Loading state -->
-    <div v-if="schemaLoading" class="uk-text-center uk-padding">
+    <!-- Loading state (only show if we don't have a provided schema) -->
+    <div v-if="!props.schema && schemaLoading" class="uk-text-center uk-padding">
         <div uk-spinner></div>
         <p>{{ $t('LOADING') }}</p>
     </div>
     
-    <!-- Error state -->
-    <div v-else-if="schemaError" class="uk-alert-danger" uk-alert>
+    <!-- Error state (only show if we don't have a provided schema) -->
+    <div v-else-if="!props.schema && schemaError" class="uk-alert-danger" uk-alert>
         <h4>{{ schemaError.title }}</h4>
         <p>{{ schemaError.description }}</p>
     </div>

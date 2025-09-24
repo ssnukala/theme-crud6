@@ -358,7 +358,7 @@ watch([model, recordId], async ([newModel, newId]) => {
         <!-- Default view mode with existing components -->
         <div v-else class="uk-child-width-expand" uk-grid>
             <div>
-                <CRUD6Info :crud6="CRUD6Row" @crud6Updated="fetch()" />
+                <CRUD6Info :crud6="CRUD6Row" :schema="schema" @crud6Updated="fetch()" />
                 <!-- Add edit button if user has permission -->
                 <div v-if="hasEditPermission && !isCreateMode" class="uk-margin-top">
                     <button 
