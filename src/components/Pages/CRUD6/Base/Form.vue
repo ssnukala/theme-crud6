@@ -73,7 +73,7 @@ watch(
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 schemaPromise.catch((error) => {
-                    console.error('Failed to load schema in watcher:', error)
+                    console.error('[Form] Failed to load schema in watcher:', error)
                 })
             }
         }
@@ -81,19 +81,7 @@ watch(
     { immediate: true }
 )
 
-/**
- * Mount hook - Load schema if model is provided and schema not provided as prop
- */
-onMounted(() => {
-    if (props.model && loadSchema && !props.schema) {
-        const schemaPromise = loadSchema(props.model)
-        if (schemaPromise && typeof schemaPromise.then === 'function') {
-            schemaPromise.catch((error) => {
-                console.error('Failed to load schema on mount:', error)
-            })
-        }
-    }
-})
+// Schema loading is handled by the watcher above with immediate: true
 
 /**
  * Emits

@@ -9,10 +9,12 @@ import { Severity } from '@userfrosting/sprinkle-core/interfaces'
 const { deleteCRUD6 } = useCRUD6Api()
 
 /**
- * Props - The CRUD6 object to delete
+ * Props - The CRUD6 object to delete, optional model and schema for consistency
  */
 const props = defineProps<{
     crud6: CRUD6Interface
+    model?: string
+    schema?: any
 }>()
 
 /**
