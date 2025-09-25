@@ -94,6 +94,7 @@ onMounted(() => {
         <CRUD6CreateModal
           v-if="hasCreatePermission"
           :model="model"
+          :schema="schema"
           @saved="sprunjer.fetch()"
           class="uk-button uk-button-primary" />
       </template>
@@ -157,10 +158,10 @@ onMounted(() => {
                 </RouterLink>
               </li>
               <li v-if="hasEditPermission">
-                <CRUD6EditModal :crud6="row" :model="model" @saved="sprunjer.fetch()" class="uk-drop-close" />
+                <CRUD6EditModal :crud6="row" :model="model" :schema="schema" @saved="sprunjer.fetch()" class="uk-drop-close" />
               </li>
               <li v-if="hasDeletePermission">
-                <CRUD6DeleteModal :crud6="row" @deleted="sprunjer.fetch()" class="uk-drop-close" />
+                <CRUD6DeleteModal :crud6="row" :model="model" :schema="schema" @deleted="sprunjer.fetch()" class="uk-drop-close" />
               </li>
             </ul>
           </div>

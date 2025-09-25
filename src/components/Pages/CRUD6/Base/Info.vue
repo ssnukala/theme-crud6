@@ -9,8 +9,9 @@ import CRUD6DeleteModal from './DeleteModal.vue'
 const route = useRoute()
 const router = useRouter()
 
-const { crud6 } = defineProps<{
+const { crud6, schema: providedSchema } = defineProps<{
     crud6: CRUD6Response
+    schema?: any
 }>()
 
 const emits = defineEmits(['crud6Updated'])
@@ -18,14 +19,17 @@ const emits = defineEmits(['crud6Updated'])
 // Get model from route parameter for schema loading
 const model = computed(() => route.params.model as string)
 
-// Use schema composable for dynamic display
+// Use schema composable for dynamic display or use provided schema
 const {
-    schema,
+    schema: composableSchema,
     loading: schemaLoading,
     error: schemaError,
     loadSchema,
     hasPermission
 } = useCRUD6Schema()
+
+// Use provided schema or fallback to composable schema
+const schema = computed(() => providedSchema || composableSchema.value)
 
 // Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))
@@ -68,9 +72,9 @@ function formatFieldValue(value: any, field: any): string {
     }
 }
 
-// Load schema when component mounts
+// Load schema when component mounts (only if schema not provided as prop)
 onMounted(() => {
-    if (model.value) {
+    if (model.value && !providedSchema) {
         loadSchema(model.value)
     }
 })
@@ -78,14 +82,14 @@ onMounted(() => {
 
 <template>
     <UFCardBox>
-        <!-- Loading state -->
-        <div v-if="schemaLoading" class="uk-text-center uk-padding">
+        <!-- Loading state (only show if we don't have a provided schema) -->
+        <div v-if="!providedSchema && schemaLoading" class="uk-text-center uk-padding">
             <div uk-spinner></div>
             <p>{{ $t('LOADING') }}</p>
         </div>
         
-        <!-- Error state -->
-        <div v-else-if="schemaError" class="uk-alert-danger" uk-alert>
+        <!-- Error state (only show if we don't have a provided schema) -->
+        <div v-else-if="!providedSchema && schemaError" class="uk-alert-danger" uk-alert>
             <h4>{{ schemaError.title }}</h4>
             <p>{{ schemaError.description }}</p>
         </div>

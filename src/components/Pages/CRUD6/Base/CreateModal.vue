@@ -3,10 +3,11 @@ import UIkit from 'uikit'
 import CRUD6Form from './Form.vue'
 
 /**
- * Props - Model for schema loading.
+ * Props - Model for schema loading and optional schema to avoid duplicate loads.
  */
 const props = defineProps<{
     model?: string
+    schema?: any
 }>()
 
 /**
@@ -33,7 +34,7 @@ const formSuccess = () => {
     <UFModal id="modal-crud6-create" closable>
         <template #header>{{ $t('CRUD6.CREATE') }}</template>
         <template #default>
-            <CRUD6Form :model="props.model" @success="formSuccess()" />
+            <CRUD6Form :model="props.model" :schema="props.schema" @success="formSuccess()" />
         </template>
     </UFModal>
 </template>
