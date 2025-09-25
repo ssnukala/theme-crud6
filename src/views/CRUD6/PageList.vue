@@ -1,6 +1,6 @@
 <!-- PageList.vue -->
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import CRUD6CreateModal from '../../components/Pages/CRUD6/Base/CreateModal.vue'
@@ -13,6 +13,24 @@ const router = useRouter()
 
 // Current model name from route
 const model = computed(() => route.params.model as string)
+
+// Track which modals have been requested by user interaction
+const loadedEditModals = ref(new Set<string>())
+const loadedDeleteModals = ref(new Set<string>())
+const showCreateModal = ref(false)
+
+// Helper functions to lazily load modals
+function requestEditModal(recordId: string) {
+  loadedEditModals.value.add(recordId)
+}
+
+function requestDeleteModal(recordId: string) {
+  loadedDeleteModals.value.add(recordId)
+}
+
+function requestCreateModal() {
+  showCreateModal.value = true
+}
 
 // CRUD6 schema composable
 const {
@@ -92,8 +110,17 @@ onMounted(() => {
 
       <!-- Actions -->
       <template #actions="{ sprunjer }">
+        <!-- Create button that triggers modal loading -->
+        <button 
+          v-if="hasCreatePermission && schema && !showCreateModal"
+          @click="requestCreateModal()"
+          class="uk-button uk-button-primary">
+          <font-awesome-icon icon="plus" fixed-width /> {{ $t('CRUD6.CREATE') }}
+        </button>
+        
+        <!-- Create Modal - only rendered after user clicks create -->
         <CRUD6CreateModal
-          v-if="hasCreatePermission && schema"
+          v-if="showCreateModal && hasCreatePermission && schema"
           :model="model"
           :schema="schema"
           @saved="sprunjer.fetch()"
@@ -159,10 +186,38 @@ onMounted(() => {
                 </RouterLink>
               </li>
               <li v-if="hasEditPermission && schema">
-                <CRUD6EditModal :crud6="row" :model="model" :schema="schema" @saved="sprunjer.fetch()" class="uk-drop-close" />
+                <!-- Edit button - shows modal loading on first click -->
+                <a v-if="!loadedEditModals.has(row.id || row.slug)" 
+                   @click="requestEditModal(row.id || row.slug)"
+                   class="uk-drop-close">
+                  <font-awesome-icon icon="pen-to-square" fixed-width /> {{ $t('CRUD6.EDIT') }}
+                </a>
+                
+                <!-- Edit Modal - only rendered after user requests it -->
+                <CRUD6EditModal 
+                  v-if="loadedEditModals.has(row.id || row.slug)"
+                  :crud6="row" 
+                  :model="model" 
+                  :schema="schema" 
+                  @saved="sprunjer.fetch()" 
+                  class="uk-drop-close" />
               </li>
               <li v-if="hasDeletePermission && schema">
-                <CRUD6DeleteModal :crud6="row" :model="model" :schema="schema" @deleted="sprunjer.fetch()" class="uk-drop-close" />
+                <!-- Delete button - shows modal loading on first click -->
+                <a v-if="!loadedDeleteModals.has(row.id || row.slug)" 
+                   @click="requestDeleteModal(row.id || row.slug)"
+                   class="uk-drop-close">
+                  <font-awesome-icon icon="trash" fixed-width /> {{ $t('CRUD6.DELETE') }}
+                </a>
+                
+                <!-- Delete Modal - only rendered after user requests it -->
+                <CRUD6DeleteModal 
+                  v-if="loadedDeleteModals.has(row.id || row.slug)"
+                  :crud6="row" 
+                  :model="model" 
+                  :schema="schema" 
+                  @deleted="sprunjer.fetch()" 
+                  class="uk-drop-close" />
               </li>
             </ul>
           </div>
