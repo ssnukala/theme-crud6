@@ -225,25 +225,27 @@ watch(
     }
 )
 
-// Watch for route changes - single source of truth for schema loading
-watch([model, recordId], async ([newModel, newId]) => {
-    if (newModel && loadSchema) {
+// Load schema when model changes - single source of truth for schema loading
+let currentModel = ''
+watch(model, async (newModel) => {
+    if (newModel && loadSchema && newModel !== currentModel) {
         try {
-            // Only load schema if not already loaded for this model
-            if (!schema.value || schema.value?.model !== newModel) {
-                console.log('[PageRow] Loading schema for model:', newModel)
-                const schemaPromise = loadSchema(newModel)
-                if (schemaPromise && typeof schemaPromise.then === 'function') {
-                    await schemaPromise
-                }
-            }
-            
-            if (newId && !isCreateMode.value) {
-                fetch()
+            console.log('[PageRow] Loading schema for model:', newModel)
+            currentModel = newModel
+            const schemaPromise = loadSchema(newModel)
+            if (schemaPromise && typeof schemaPromise.then === 'function') {
+                await schemaPromise
             }
         } catch (error) {
-            console.error('Failed to load schema in route watcher:', error)
+            console.error('[PageRow] Failed to load schema:', error)
         }
+    }
+}, { immediate: true })
+
+// Watch for recordId changes to fetch data
+watch(recordId, (newId) => {
+    if (newId && !isCreateMode.value) {
+        fetch()
     }
 }, { immediate: true })
 </script>
