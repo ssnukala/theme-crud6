@@ -145,7 +145,10 @@ function formatFieldValue(value: any, field: any): string {
 // Load data when component mounts
 onMounted(async () => {
     if (model.value) {
-        await loadSchema(model.value)
+        // Only load schema if not already loaded
+        if (!schema.value && loadSchema) {
+            await loadSchema(model.value)
+        }
         
         if (!isCreateMode.value && recordId.value) {
             fetch()
@@ -185,9 +188,12 @@ watch(
 watch([model, recordId], async ([newModel, newId]) => {
     if (newModel && loadSchema) {
         try {
-            const schemaPromise = loadSchema(newModel)
-            if (schemaPromise && typeof schemaPromise.then === 'function') {
-                await schemaPromise
+            // Only load schema if not already loaded for this model
+            if (!schema.value || schema.value?.model !== newModel) {
+                const schemaPromise = loadSchema(newModel)
+                if (schemaPromise && typeof schemaPromise.then === 'function') {
+                    await schemaPromise
+                }
             }
             
             if (newId && !isCreateMode.value) {

@@ -74,7 +74,7 @@ function formatFieldValue(value: any, field: any): string {
 
 // Load schema when component mounts (only if schema not provided as prop)
 onMounted(() => {
-    if (model.value && !providedSchema) {
+    if (model.value && !providedSchema && !composableSchema.value) {
         loadSchema(model.value)
     }
 })

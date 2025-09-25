@@ -69,7 +69,7 @@ watch(
 watch(
     () => props.model,
     (newModel) => {
-        if (newModel && loadSchema && !props.schema) {
+        if (newModel && loadSchema && !props.schema && !composableSchema.value) {
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 schemaPromise.catch((error) => {
@@ -291,7 +291,7 @@ function getFieldIcon(field: any, fieldKey: string): string {
                         v-model="formData[fieldKey]" />
                     
                     <!-- Validation errors -->
-                    <UFFormValidationError :errors="r$.$errors[fieldKey]" />
+                    <UFFormValidationError :errors="r$.$errors[fieldKey] || []" />
                 </div>
             </div>
 
