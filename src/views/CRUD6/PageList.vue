@@ -60,9 +60,9 @@ onMounted(() => {
     const schemaPromise = loadSchema(model.value)
     if (schemaPromise && typeof schemaPromise.then === 'function') {
       schemaPromise.then(() => {
-        console.log('Line 61 : Schema loaded:', schema.value)
+        console.log('[PageList] Schema loaded successfully')
       }).catch((error) => {
-        console.error('Failed to load schema:', error)
+        console.error('[PageList] Failed to load schema:', error)
       })
     }
   }
@@ -92,7 +92,7 @@ onMounted(() => {
       <!-- Actions -->
       <template #actions="{ sprunjer }">
         <CRUD6CreateModal
-          v-if="hasCreatePermission"
+          v-if="hasCreatePermission && schema"
           :model="model"
           :schema="schema"
           @saved="sprunjer.fetch()"
@@ -157,10 +157,10 @@ onMounted(() => {
                   <font-awesome-icon icon="eye" fixed-width /> View
                 </RouterLink>
               </li>
-              <li v-if="hasEditPermission">
+              <li v-if="hasEditPermission && schema">
                 <CRUD6EditModal :crud6="row" :model="model" :schema="schema" @saved="sprunjer.fetch()" class="uk-drop-close" />
               </li>
-              <li v-if="hasDeletePermission">
+              <li v-if="hasDeletePermission && schema">
                 <CRUD6DeleteModal :crud6="row" :model="model" :schema="schema" @deleted="sprunjer.fetch()" class="uk-drop-close" />
               </li>
             </ul>
