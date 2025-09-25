@@ -69,11 +69,16 @@ watch(
 watch(
     () => props.model,
     (newModel) => {
-        if (newModel && loadSchema && !props.schema && !composableSchema.value) {
+        // Only load schema if:
+        // 1. We have a model
+        // 2. We have a loadSchema function 
+        // 3. No schema was provided as a prop
+        if (newModel && loadSchema && !props.schema) {
+            console.log('[Form] Loading schema for model:', newModel)
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 schemaPromise.catch((error) => {
-                    console.error('[Form] Failed to load schema in watcher:', error)
+                    console.error('[Form] Failed to load schema:', error)
                 })
             }
         }
