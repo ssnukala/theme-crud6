@@ -41,18 +41,62 @@ const {
     resetForm
 } = useCRUD6Api()
 
+// Helper function to create initial object based on schema
+function createInitialRecord(schemaFields?: any): CRUD6Response {
+    const defaultRecord: CRUD6Response = {
+        id: 0,
+        name: '',
+        slug: '',
+        description: '',
+        icon: '',
+        created_at: '',
+        updated_at: '',
+        deleted_at: null,
+        users_count: 0
+    }
+
+    if (!schemaFields) {
+        return defaultRecord
+    }
+
+    // Create dynamic structure based on schema fields
+    const dynamicRecord: any = {}
+    
+    Object.entries(schemaFields).forEach(([fieldKey, field]: [string, any]) => {
+        switch (field.type) {
+            case 'boolean':
+                dynamicRecord[fieldKey] = field.default ?? false
+                break
+            case 'integer':
+            case 'decimal':
+            case 'float':
+            case 'number':
+                dynamicRecord[fieldKey] = field.default ?? 0
+                break
+            case 'date':
+            case 'datetime':
+                dynamicRecord[fieldKey] = field.default ?? ''
+                break
+            case 'json':
+                dynamicRecord[fieldKey] = field.default ?? null
+                break
+            case 'string':
+            case 'email':
+            case 'url':  
+            case 'password':
+            case 'text':
+            default:
+                dynamicRecord[fieldKey] = field.default ?? ''
+                break
+        }
+    })
+
+    // Merge with default structure to ensure required fields exist
+    return { ...defaultRecord, ...dynamicRecord }
+}
+
 // Use the schema to set the initial response structure
-const CRUD6Row = ref<CRUD6Response>({
-    id: 0,
-    name: '',
-    slug: '',
-    description: '',
-    icon: '',
-    created_at: '',
-    updated_at: '',
-    deleted_at: null,
-    users_count: 0
-})
+const CRUD6Row = ref<CRUD6Response>(createInitialRecord())
 
 // Reactive state for record management
 const record = ref<CRUD6Interface | null>(null)
@@ -144,30 +188,16 @@ function formatFieldValue(value: any, field: any): string {
 
 // Load data when component mounts
 onMounted(async () => {
-    if (model.value) {
-        // Only load schema if not already loaded
-        if (!schema.value && loadSchema) {
-            await loadSchema(model.value)
-        }
-        
-        if (!isCreateMode.value && recordId.value) {
-            fetch()
-        } else if (isCreateMode.value) {
-            // Initialize empty record for create mode
-            record.value = {}
-            CRUD6Row.value = {
-                id: 0,
-                name: '',
-                slug: '',
-                description: '',
-                icon: '',
-                created_at: '',
-                updated_at: '',
-                deleted_at: null,
-                users_count: 0
-            }
-            resetForm()
-        }
+    // Schema loading is handled by the route watcher with immediate: true
+    // No need to load schema here to avoid duplicate calls
+    
+    if (!isCreateMode.value && recordId.value) {
+        fetch()
+    } else if (isCreateMode.value) {
+        // Initialize empty record for create mode using schema
+        record.value = {}
+        CRUD6Row.value = createInitialRecord(schema.value?.fields)
+        resetForm()
     }
 })
 
@@ -184,12 +214,24 @@ watch(
     { immediate: false }
 )
 
-// Watch for route changes
+// Watch for schema changes to update initial record structure
+watch(
+    () => schema.value,
+    (newSchema) => {
+        if (newSchema?.fields && isCreateMode.value) {
+            // Update the initial record structure when schema loads in create mode
+            CRUD6Row.value = createInitialRecord(newSchema.fields)
+        }
+    }
+)
+
+// Watch for route changes - single source of truth for schema loading
 watch([model, recordId], async ([newModel, newId]) => {
     if (newModel && loadSchema) {
         try {
             // Only load schema if not already loaded for this model
             if (!schema.value || schema.value?.model !== newModel) {
+                console.log('[PageRow] Loading schema for model:', newModel)
                 const schemaPromise = loadSchema(newModel)
                 if (schemaPromise && typeof schemaPromise.then === 'function') {
                     await schemaPromise
@@ -203,7 +245,7 @@ watch([model, recordId], async ([newModel, newId]) => {
             console.error('Failed to load schema in route watcher:', error)
         }
     }
-})
+}, { immediate: true })
 </script>
 
 <template>

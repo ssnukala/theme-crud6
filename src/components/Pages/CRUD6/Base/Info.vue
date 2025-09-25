@@ -150,6 +150,7 @@ onMounted(() => {
             <CRUD6EditModal
                 :crud6="crud6"
                 :model="model"
+                :schema="schema"
                 @saved="emits('crud6Updated')"
                 v-if="hasUpdatePermission"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
@@ -157,6 +158,7 @@ onMounted(() => {
             <CRUD6DeleteModal
                 :crud6="crud6"
                 :model="model"
+                :schema="schema"
                 @deleted="router.push({ name: 'crud6.list', params: { model: model } })"
                 v-if="hasDeletePermission"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small" />
@@ -184,11 +186,13 @@ onMounted(() => {
             <hr />
             <CRUD6EditModal
                 :crud6="crud6"
+                :schema="schema"
                 @saved="emits('crud6Updated')"
                 v-if="$checkAccess('update_crud6_field')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             <CRUD6DeleteModal
                 :crud6="crud6"
+                :schema="schema"
                 @deleted="router.push({ name: 'crud6.list' })"
                 v-if="$checkAccess('delete_crud6_row')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small" />
