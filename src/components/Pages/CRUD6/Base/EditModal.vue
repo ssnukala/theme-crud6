@@ -12,11 +12,6 @@ const props = defineProps<{
     schema?: any
 }>()
 
-console.log('[EditModal] Component created with props:')
-console.log('  - model:', props.model)
-console.log('  - schema provided:', !!props.schema)
-console.log('  - crud6 id:', props.crud6?.id)
-
 /**
  * Emits - Define the saved event. This event is emitted when the form is saved
  * to notify the parent component to refresh the data.

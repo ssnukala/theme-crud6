@@ -28,9 +28,6 @@ const {
     loadSchema
 } = useCRUD6Schema()
 
-console.log('[Form] Schema composable initialized')
-console.log('[Form] Props at creation - model:', props.model, 'schema provided:', !!props.schema)
-
 // Use provided schema or fallback to composable schema
 const schema = computed(() => props.schema || composableSchema.value)
 
@@ -72,33 +69,18 @@ watch(
 watch(
     () => props.model,
     (newModel) => {
-        console.log('[Form] WATCHER triggered - Model:', newModel)
-        console.log('[Form] WATCHER - props.schema provided:', !!props.schema)
-        console.log('[Form] WATCHER - composableSchema exists:', !!composableSchema.value)
-        console.log('[Form] WATCHER - loadSchema available:', !!loadSchema)
-        
         // Only load schema if:
         // 1. We have a model
         // 2. We have a loadSchema function 
         // 3. No schema was provided as a prop
-        // 4. We don't already have a schema from the composable
         if (newModel && loadSchema && !props.schema) {
-            console.log('[Form] 🔄 CALLING loadSchema from watcher for model:', newModel)
+            console.log('[Form] Loading schema for model:', newModel)
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
-                schemaPromise
-                    .then(() => {
-                        console.log('[Form] ✅ Schema loaded from watcher for:', newModel)
-                    })
-                    .catch((error) => {
-                        console.error('[Form] ❌ Failed to load schema in watcher:', error)
-                    })
+                schemaPromise.catch((error) => {
+                    console.error('[Form] Failed to load schema:', error)
+                })
             }
-        } else {
-            console.log('[Form] SKIPPED schema loading in watcher - Reason:')
-            console.log('  - Model provided:', !!newModel)
-            console.log('  - loadSchema available:', !!loadSchema) 
-            console.log('  - Schema prop provided:', !!props.schema)
         }
     },
     { immediate: true }
