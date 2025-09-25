@@ -144,30 +144,26 @@ function formatFieldValue(value: any, field: any): string {
 
 // Load data when component mounts
 onMounted(async () => {
-    if (model.value) {
-        // Only load schema if not already loaded
-        if (!schema.value && loadSchema) {
-            await loadSchema(model.value)
+    // Schema loading is handled by the route watcher with immediate: true
+    // No need to load schema here to avoid duplicate calls
+    
+    if (!isCreateMode.value && recordId.value) {
+        fetch()
+    } else if (isCreateMode.value) {
+        // Initialize empty record for create mode
+        record.value = {}
+        CRUD6Row.value = {
+            id: 0,
+            name: '',
+            slug: '',
+            description: '',
+            icon: '',
+            created_at: '',
+            updated_at: '',
+            deleted_at: null,
+            users_count: 0
         }
-        
-        if (!isCreateMode.value && recordId.value) {
-            fetch()
-        } else if (isCreateMode.value) {
-            // Initialize empty record for create mode
-            record.value = {}
-            CRUD6Row.value = {
-                id: 0,
-                name: '',
-                slug: '',
-                description: '',
-                icon: '',
-                created_at: '',
-                updated_at: '',
-                deleted_at: null,
-                users_count: 0
-            }
-            resetForm()
-        }
+        resetForm()
     }
 })
 
@@ -184,12 +180,13 @@ watch(
     { immediate: false }
 )
 
-// Watch for route changes
+// Watch for route changes - single source of truth for schema loading
 watch([model, recordId], async ([newModel, newId]) => {
     if (newModel && loadSchema) {
         try {
             // Only load schema if not already loaded for this model
             if (!schema.value || schema.value?.model !== newModel) {
+                console.log('[PageRow] Loading schema for model:', newModel)
                 const schemaPromise = loadSchema(newModel)
                 if (schemaPromise && typeof schemaPromise.then === 'function') {
                     await schemaPromise
@@ -203,7 +200,7 @@ watch([model, recordId], async ([newModel, newId]) => {
             console.error('Failed to load schema in route watcher:', error)
         }
     }
-})
+}, { immediate: true })
 </script>
 
 <template>
