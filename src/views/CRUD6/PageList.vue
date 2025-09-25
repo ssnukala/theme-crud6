@@ -23,6 +23,10 @@ const {
   hasPermission,
 } = useCRUD6Schema()
 
+console.log('[PageList] Schema composable initialized')
+console.log('[PageList] Initial schema state:', !!schema.value)
+console.log('[PageList] Initial loading state:', schemaLoading.value)
+
 // Permissions
 const hasCreatePermission = computed(() => hasPermission('create'))
 const hasEditPermission   = computed(() => hasPermission('update'))
@@ -56,15 +60,21 @@ function viewRecord(record: CRUD6Interface) {
 
 // Load schema
 onMounted(() => {
+  console.log('[PageList] MOUNTED - Model value:', model.value)
+  console.log('[PageList] MOUNTED - loadSchema function available:', !!loadSchema)
+  
   if (model.value && loadSchema) {
+    console.log('[PageList] CALLING loadSchema for model:', model.value)
     const schemaPromise = loadSchema(model.value)
     if (schemaPromise && typeof schemaPromise.then === 'function') {
       schemaPromise.then(() => {
-        console.log('[PageList] Schema loaded successfully')
+        console.log('[PageList] ✅ Schema loaded successfully for:', model.value)
       }).catch((error) => {
-        console.error('[PageList] Failed to load schema:', error)
+        console.error('[PageList] ❌ Failed to load schema:', error)
       })
     }
+  } else {
+    console.log('[PageList] SKIPPED schema loading - Model:', model.value, 'loadSchema:', !!loadSchema)
   }
 })
 </script>

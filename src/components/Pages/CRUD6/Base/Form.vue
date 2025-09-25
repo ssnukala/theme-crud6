@@ -28,6 +28,9 @@ const {
     loadSchema
 } = useCRUD6Schema()
 
+console.log('[Form] Schema composable initialized')
+console.log('[Form] Props at creation - model:', props.model, 'schema provided:', !!props.schema)
+
 // Use provided schema or fallback to composable schema
 const schema = computed(() => props.schema || composableSchema.value)
 
@@ -69,13 +72,25 @@ watch(
 watch(
     () => props.model,
     (newModel) => {
+        console.log('[Form] WATCHER triggered - Model:', newModel)
+        console.log('[Form] WATCHER - props.schema provided:', !!props.schema)
+        console.log('[Form] WATCHER - composableSchema exists:', !!composableSchema.value)
+        console.log('[Form] WATCHER - loadSchema available:', !!loadSchema)
+        
         if (newModel && loadSchema && !props.schema && !composableSchema.value) {
+            console.log('[Form] 🔄 CALLING loadSchema from watcher for model:', newModel)
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
-                schemaPromise.catch((error) => {
-                    console.error('[Form] Failed to load schema in watcher:', error)
-                })
+                schemaPromise
+                    .then(() => {
+                        console.log('[Form] ✅ Schema loaded from watcher for:', newModel)
+                    })
+                    .catch((error) => {
+                        console.error('[Form] ❌ Failed to load schema in watcher:', error)
+                    })
             }
+        } else {
+            console.log('[Form] SKIPPED schema loading in watcher - conditions not met')
         }
     },
     { immediate: true }
