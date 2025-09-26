@@ -65,6 +65,7 @@ watch(
 
 /**
  * Load schema when model prop changes (only if schema not provided as prop)
+ * Schema loading should primarily be handled by PageRow component
  */
 watch(
     () => props.model,
@@ -72,15 +73,17 @@ watch(
         // Only load schema if:
         // 1. We have a model
         // 2. We have a loadSchema function 
-        // 3. No schema was provided as a prop
+        // 3. No schema was provided as a prop (PageRow should provide it)
         if (newModel && loadSchema && !props.schema) {
-            console.log('[Form] Loading schema for model:', newModel)
+            console.log('[Form] Loading schema for model (no schema prop provided):', newModel)
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 schemaPromise.catch((error) => {
                     console.error('[Form] Failed to load schema:', error)
                 })
             }
+        } else if (props.schema) {
+            console.log('[Form] Using provided schema prop - no API call needed')
         }
     },
     { immediate: true }

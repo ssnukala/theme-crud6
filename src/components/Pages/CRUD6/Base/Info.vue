@@ -19,17 +19,13 @@ const emits = defineEmits(['crud6Updated'])
 // Get model from route parameter for schema loading
 const model = computed(() => route.params.model as string)
 
-// Use schema composable for dynamic display or use provided schema
+// Use schema composable for permissions only - schema loading is handled by parent PageRow
 const {
-    schema: composableSchema,
-    loading: schemaLoading,
-    error: schemaError,
-    loadSchema,
     hasPermission
 } = useCRUD6Schema()
 
-// Use provided schema or fallback to composable schema
-const schema = computed(() => providedSchema || composableSchema.value)
+// Always use provided schema - PageRow is the single source of truth for schema loading
+const schema = computed(() => providedSchema)
 
 // Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))
@@ -72,26 +68,14 @@ function formatFieldValue(value: any, field: any): string {
     }
 }
 
-// Schema loading is handled by parent PageRow component
-// No need to load schema here as it's always passed as a prop from PageRow
+// Schema loading is handled by parent PageRow component and passed as a prop
+// PageRow always provides schema, so no loading states needed here
 </script>
 
 <template>
     <UFCardBox>
-        <!-- Loading state (only show if we don't have a provided schema) -->
-        <div v-if="!providedSchema && schemaLoading" class="uk-text-center uk-padding">
-            <div uk-spinner></div>
-            <p>{{ $t('LOADING') }}</p>
-        </div>
-        
-        <!-- Error state (only show if we don't have a provided schema) -->
-        <div v-else-if="!providedSchema && schemaError" class="uk-alert-danger" uk-alert>
-            <h4>{{ schemaError.title }}</h4>
-            <p>{{ schemaError.description }}</p>
-        </div>
-        
-        <!-- Dynamic content based on schema -->
-        <template v-else-if="schema">
+        <!-- Dynamic content based on schema (provided by PageRow) -->
+        <template v-if="schema">
             <!-- Icon display (if icon field exists and has value) -->
             <div v-if="iconField && crud6.icon" class="uk-text-center">
                 <font-awesome-icon :icon="crud6.icon" class="fa-5x" />
