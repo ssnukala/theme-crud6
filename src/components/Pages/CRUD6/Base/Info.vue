@@ -32,18 +32,18 @@ function requestDeleteModal() {
     showDeleteModal.value = true
 }
 
-// Use schema composable consistent with PageList.vue and PageRow.vue patterns
+// Use schema composable with same pattern as PageList.vue
 const {
-    schema: composableSchema,
+    schema,
     loading: schemaLoading,
     error: schemaError,
     loadSchema,
     hasPermission
 } = useCRUD6Schema()
 
-// Always use provided schema from PageRow - no need to load schema independently
-// This maintains consistency with PageList.vue destructuring pattern while avoiding redundant calls
-const schema = computed(() => providedSchema || composableSchema.value)
+// Override schema with provided prop when available (PageList.vue doesn't have this need)
+// This maintains PageList.vue destructuring pattern while respecting PageRow's provided schema
+const finalSchema = computed(() => providedSchema || schema.value)
 
 // Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))
@@ -52,17 +52,17 @@ const hasViewFieldPermission = computed(() => hasPermission('view_field'))
 
 // Computed properties for dynamic display
 const displayFields = computed(() => {
-    if (!schema.value?.fields) return {}
+    if (!finalSchema.value?.fields) return {}
     return Object.fromEntries(
-        Object.entries(schema.value.fields).filter(([key, field]) => 
+        Object.entries(finalSchema.value.fields).filter(([key, field]) => 
             field.displayable !== false && key !== 'icon'
         )
     )
 })
 
 const iconField = computed(() => {
-    if (!schema.value?.fields) return null
-    return schema.value.fields.icon || null
+    if (!finalSchema.value?.fields) return null
+    return finalSchema.value.fields.icon || null
 })
 
 // Helper function to format field values for display
@@ -94,7 +94,7 @@ function formatFieldValue(value: any, field: any): string {
 <template>
     <UFCardBox>
         <!-- Dynamic content based on schema (provided by PageRow) -->
-        <template v-if="schema">
+        <template v-if="finalSchema">
             <!-- Icon display (if icon field exists and has value) -->
             <div v-if="iconField && crud6.icon" class="uk-text-center">
                 <font-awesome-icon :icon="crud6.icon" class="fa-5x" />
@@ -102,12 +102,12 @@ function formatFieldValue(value: any, field: any): string {
             
             <!-- Title - use schema title field or fallback to name -->
             <h3 class="uk-text-center uk-margin-remove">
-                {{ crud6[schema.title_field || 'name'] || crud6.name }}
+                {{ crud6[finalSchema.title_field || 'name'] || crud6.name }}
             </h3>
             
             <!-- Description - use schema description field or fallback -->
-            <p v-if="crud6[schema.description_field || 'description']" class="uk-text-meta">
-                {{ crud6[schema.description_field || 'description'] }}
+            <p v-if="crud6[finalSchema.description_field || 'description']" class="uk-text-meta">
+                {{ crud6[finalSchema.description_field || 'description'] }}
             </p>
             
             <hr />
@@ -159,7 +159,7 @@ function formatFieldValue(value: any, field: any): string {
                 v-if="hasUpdatePermission && showEditModal"
                 :crud6="crud6"
                 :model="model"
-                :schema="schema"
+                :schema="finalSchema"
                 @saved="emits('crud6Updated')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             
@@ -176,7 +176,7 @@ function formatFieldValue(value: any, field: any): string {
                 v-if="hasDeletePermission && showDeleteModal"
                 :crud6="crud6"
                 :model="model"
-                :schema="schema"
+                :schema="finalSchema"
                 @deleted="router.push({ name: 'crud6.list', params: { model: model } })"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small" />
             
@@ -205,7 +205,7 @@ function formatFieldValue(value: any, field: any): string {
             <CRUD6EditModal
                 v-if="$checkAccess('update_crud6_field')"
                 :crud6="crud6"
-                :schema="schema"
+                :schema="finalSchema"
                 @saved="emits('crud6Updated')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             
@@ -213,7 +213,7 @@ function formatFieldValue(value: any, field: any): string {
             <CRUD6DeleteModal
                 v-if="$checkAccess('delete_crud6_row')"
                 :crud6="crud6"
-                :schema="schema"
+                :schema="finalSchema"
                 @deleted="router.push({ name: 'crud6.list' })"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small" />
             <slot data-test="slot"></slot>
