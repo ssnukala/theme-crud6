@@ -19,25 +19,15 @@ const emits = defineEmits(['crud6Updated'])
 // Get model from route parameter for schema loading
 const model = computed(() => route.params.model as string)
 
-// Use schema composable for permissions only when no schema is provided
-// When schema is provided by PageRow, we don't need the composable at all
-const schemaComposable = providedSchema ? null : useCRUD6Schema()
-const hasPermission = providedSchema 
-    ? () => {
-        console.log('[Info] Using schema prop permissions (no API call)')
-        return true  // Use simple permission check when schema is provided
-      }
-    : schemaComposable?.hasPermission || (() => {
-        console.log('[Info] Using fallback permissions (no schema composable)')
-        return true
-      })
-
-console.log('[Info] Component initialized with schema prop:', !!providedSchema)
+// Use schema composable for permissions only - schema loading is handled by parent PageRow
+const {
+    hasPermission
+} = useCRUD6Schema()
 
 // Always use provided schema - PageRow is the single source of truth for schema loading
 const schema = computed(() => providedSchema)
 
-// Permission checks using schema-driven permissions or simple defaults when schema provided
+// Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))
 const hasDeletePermission = computed(() => hasPermission('delete'))
 const hasViewFieldPermission = computed(() => hasPermission('view_field'))
