@@ -83,7 +83,9 @@ watch(
                 })
             }
         } else if (props.schema) {
-            console.log('[Form] Using provided schema prop - no API call needed')
+            console.log('[Form] Using provided schema prop - no API call needed for model:', newModel)
+        } else {
+            console.log('[Form] No schema loading needed - no model or loadSchema function available')
         }
     },
     { immediate: true }
@@ -101,7 +103,7 @@ const emits = defineEmits(['success'])
  */
 const submitForm = async () => {
     // Make sure validation is up to date
-    const isValid = await r$.$validate()
+    const isValid = r$ ? await r$.$validate() : { valid: true }
     if (!isValid.valid) return
 
     const apiCall = props.crud6
@@ -299,7 +301,7 @@ function getFieldIcon(field: any, fieldKey: string): string {
                         v-model="formData[fieldKey]" />
                     
                     <!-- Validation errors -->
-                    <UFFormValidationError :errors="r$.$errors[fieldKey] || []" />
+                    <UFFormValidationError :errors="(r$ && r$.$errors && r$.$errors[fieldKey]) || []" />
                 </div>
             </div>
 
@@ -310,7 +312,7 @@ function getFieldIcon(field: any, fieldKey: string): string {
                 </button>
                 <button
                     class="uk-button uk-button-primary"
-                    :disabled="r$.$error || isLoading"
+                    :disabled="(r$ && r$.$error) || isLoading"
                     type="submit">
                     <div v-if="isLoading" uk-spinner="ratio: 0.5"></div>
                     {{ $t('SAVE') }}

@@ -228,6 +228,7 @@ watch(model, async (newModel) => {
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 await schemaPromise
+                console.log('[PageRow] Schema loaded successfully for:', newModel)
             }
         } catch (error) {
             console.error('[PageRow] Failed to load schema:', error)
