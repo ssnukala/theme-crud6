@@ -107,7 +107,6 @@ const loading = computed(() => schemaLoading.value || apiLoading.value)
 const error = computed(() => schemaError.value || apiError.value)
 
 // Permission checks
-const hasEditPermission = computed(() => hasPermission('update'))
 const hasCreatePermission = computed(() => hasPermission('create'))
 const hasViewPermission = computed(() => hasPermission('view'))
 
@@ -133,12 +132,6 @@ function fetch() {
 // Actions for form management
 function goBack() {
     router.push(`/crud6/${model.value}`)
-}
-
-function toggleEditMode() {
-    isEditMode.value = true
-    // Store original record for cancel functionality
-    originalRecord.value = { ...record.value }
 }
 
 function cancelEdit() {
@@ -409,14 +402,6 @@ watch(recordId, (newId) => {
         <div v-else class="uk-child-width-expand" uk-grid>
             <div>
                 <CRUD6Info :crud6="CRUD6Row" :schema="schema" @crud6Updated="fetch()" />
-                <!-- Add edit button if user has permission -->
-                <div v-if="hasEditPermission && !isCreateMode" class="uk-margin-top">
-                    <button 
-                        @click="toggleEditMode"
-                        class="uk-button uk-button-primary uk-width-1-1">
-                        <font-awesome-icon icon="edit" /> {{ $t('EDIT') }}
-                    </button>
-                </div>
             </div>
             <div class="uk-width-2-3" v-if="$checkAccess('view_crud6_field')">
                 <CRUD6Users :slug="$route.params.id" />
