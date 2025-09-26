@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import type { CRUD6Response } from '@ssnukala/sprinkle-crud6/interfaces'
@@ -18,19 +18,6 @@ const emits = defineEmits(['crud6Updated'])
 
 // Get model from route parameter for schema loading
 const model = computed(() => route.params.model as string)
-
-// Lazy loading state for modals (similar to PageList.vue pattern)
-const showEditModal = ref(false)
-const showDeleteModal = ref(false)
-
-// Helper functions to lazily load modals
-function requestEditModal() {
-    showEditModal.value = true
-}
-
-function requestDeleteModal() {
-    showDeleteModal.value = true
-}
 
 // Use schema composable for dynamic display or use provided schema
 const {
@@ -155,33 +142,19 @@ function formatFieldValue(value: any, field: any): string {
             
             <hr />
             
-            <!-- Action buttons with dynamic permissions and lazy loading -->
-            <!-- Edit button - shows modal loading on first click -->
-            <a v-if="hasUpdatePermission && !showEditModal" 
-               @click="requestEditModal()"
-               class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small">
-              <font-awesome-icon icon="pen-to-square" fixed-width /> {{ $t('CRUD6.EDIT') }}
-            </a>
-            
-            <!-- Edit Modal - only rendered after user requests it -->
+            <!-- Action buttons with dynamic permissions -->
+            <!-- Edit Modal - always rendered but only shows button when requested -->
             <CRUD6EditModal
-                v-if="hasUpdatePermission && showEditModal"
+                v-if="hasUpdatePermission"
                 :crud6="crud6"
                 :model="model"
                 :schema="schema"
                 @saved="emits('crud6Updated')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             
-            <!-- Delete button - shows modal loading on first click -->
-            <a v-if="hasDeletePermission && !showDeleteModal" 
-               @click="requestDeleteModal()"
-               class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small">
-              <font-awesome-icon icon="trash" fixed-width /> {{ $t('CRUD6.DELETE') }}
-            </a>
-            
-            <!-- Delete Modal - only rendered after user requests it -->
+            <!-- Delete Modal - always rendered but only shows button when requested -->
             <CRUD6DeleteModal
-                v-if="hasDeletePermission && showDeleteModal"
+                v-if="hasDeletePermission"
                 :crud6="crud6"
                 :model="model"
                 :schema="schema"
@@ -209,31 +182,17 @@ function formatFieldValue(value: any, field: any): string {
                 </dd>
             </dl>
             <hr />
-            <!-- Edit button - shows modal loading on first click -->
-            <a v-if="$checkAccess('update_crud6_field') && !showEditModal" 
-               @click="requestEditModal()"
-               class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small">
-              <font-awesome-icon icon="pen-to-square" fixed-width /> {{ $t('CRUD6.EDIT') }}
-            </a>
-            
-            <!-- Edit Modal - only rendered after user requests it -->
+            <!-- Edit Modal - always rendered -->
             <CRUD6EditModal
-                v-if="$checkAccess('update_crud6_field') && showEditModal"
+                v-if="$checkAccess('update_crud6_field')"
                 :crud6="crud6"
                 :schema="schema"
                 @saved="emits('crud6Updated')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             
-            <!-- Delete button - shows modal loading on first click -->
-            <a v-if="$checkAccess('delete_crud6_row') && !showDeleteModal" 
-               @click="requestDeleteModal()"
-               class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small">
-              <font-awesome-icon icon="trash" fixed-width /> {{ $t('CRUD6.DELETE') }}
-            </a>
-            
-            <!-- Delete Modal - only rendered after user requests it -->
+            <!-- Delete Modal - always rendered -->
             <CRUD6DeleteModal
-                v-if="$checkAccess('delete_crud6_row') && showDeleteModal"
+                v-if="$checkAccess('delete_crud6_row')"
                 :crud6="crud6"
                 :schema="schema"
                 @deleted="router.push({ name: 'crud6.list' })"
