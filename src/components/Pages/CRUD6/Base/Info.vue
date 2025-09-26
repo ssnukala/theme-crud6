@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import type { CRUD6Response } from '@ssnukala/sprinkle-crud6/interfaces'
@@ -18,6 +18,19 @@ const emits = defineEmits(['crud6Updated'])
 
 // Get model from route parameter for schema loading
 const model = computed(() => route.params.model as string)
+
+// Lazy loading state for modals (following PageList pattern)
+const showEditModal = ref(false)
+const showDeleteModal = ref(false)
+
+// Helper functions to lazily load modals
+function requestEditModal() {
+    showEditModal.value = true
+}
+
+function requestDeleteModal() {
+    showDeleteModal.value = true
+}
 
 // Use schema composable for permissions only - schema loading is handled by parent PageRow
 const {
@@ -69,7 +82,8 @@ function formatFieldValue(value: any, field: any): string {
 }
 
 // Schema loading is completely handled by parent PageRow component and passed as a prop
-// When schema prop is provided, we don't use the composable at all to avoid redundant API calls
+// When schema prop is provided, we don't use the composable for loading at all to avoid redundant API calls
+// The lazy loading pattern prevents modal components from being instantiated until user interaction
 </script>
 
 <template>
@@ -126,19 +140,35 @@ function formatFieldValue(value: any, field: any): string {
             
             <hr />
             
-            <!-- Action buttons with dynamic permissions -->
-            <!-- Edit Modal - always rendered but only shows button when requested -->
+            <!-- Action buttons with dynamic permissions - Lazy Loading Pattern -->
+            <!-- Edit button - shows modal only after user clicks -->
+            <button
+                v-if="hasUpdatePermission && !showEditModal"
+                @click="requestEditModal()"
+                class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small">
+                <font-awesome-icon icon="pen-to-square" fixed-width /> {{ $t('CRUD6.EDIT') }}
+            </button>
+            
+            <!-- Edit Modal - only rendered after user requests it -->
             <CRUD6EditModal
-                v-if="hasUpdatePermission"
+                v-if="hasUpdatePermission && showEditModal"
                 :crud6="crud6"
                 :model="model"
                 :schema="schema"
                 @saved="emits('crud6Updated')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             
-            <!-- Delete Modal - always rendered but only shows button when requested -->
+            <!-- Delete button - shows modal only after user clicks -->
+            <button
+                v-if="hasDeletePermission && !showDeleteModal"
+                @click="requestDeleteModal()"
+                class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-danger uk-button-small">
+                <font-awesome-icon icon="trash" fixed-width /> {{ $t('CRUD6.DELETE') }}
+            </button>
+            
+            <!-- Delete Modal - only rendered after user requests it -->
             <CRUD6DeleteModal
-                v-if="hasDeletePermission"
+                v-if="hasDeletePermission && showDeleteModal"
                 :crud6="crud6"
                 :model="model"
                 :schema="schema"
@@ -166,7 +196,7 @@ function formatFieldValue(value: any, field: any): string {
                 </dd>
             </dl>
             <hr />
-            <!-- Edit Modal - always rendered -->
+            <!-- Legacy Edit Modal - always rendered for backward compatibility -->
             <CRUD6EditModal
                 v-if="$checkAccess('update_crud6_field')"
                 :crud6="crud6"
@@ -174,7 +204,7 @@ function formatFieldValue(value: any, field: any): string {
                 @saved="emits('crud6Updated')"
                 class="uk-width-1-1 uk-margin-small-bottom uk-button uk-button-primary uk-button-small" />
             
-            <!-- Delete Modal - always rendered -->
+            <!-- Legacy Delete Modal - always rendered for backward compatibility -->
             <CRUD6DeleteModal
                 v-if="$checkAccess('delete_crud6_row')"
                 :crud6="crud6"
