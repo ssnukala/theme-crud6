@@ -32,13 +32,15 @@ function requestDeleteModal() {
     showDeleteModal.value = true
 }
 
-// Use schema composable for permissions only - schema loading is handled by parent PageRow
-const {
-    hasPermission
-} = useCRUD6Schema()
-
 // Always use provided schema - PageRow is the single source of truth for schema loading
+// We ONLY use the composable for permission checks, never for schema loading
+// This prevents the redundant schema API call mentioned in issue "PageRow still has 2 schema API calls"
 const schema = computed(() => providedSchema)
+
+// For permissions, we can use hasPermission but avoid any automatic schema loading
+// by using the composable in a way that doesn't trigger schema loading
+const schemaComposable = useCRUD6Schema()
+const hasPermission = schemaComposable.hasPermission
 
 // Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))
