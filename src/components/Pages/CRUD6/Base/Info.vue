@@ -32,15 +32,18 @@ function requestDeleteModal() {
     showDeleteModal.value = true
 }
 
-// Always use provided schema - PageRow is the single source of truth for schema loading
-// We ONLY use the composable for permission checks, never for schema loading
-// This prevents the redundant schema API call mentioned in issue "PageRow still has 2 schema API calls"
-const schema = computed(() => providedSchema)
+// Use schema composable consistent with PageList.vue and PageRow.vue patterns
+const {
+    schema: composableSchema,
+    loading: schemaLoading,
+    error: schemaError,
+    loadSchema,
+    hasPermission
+} = useCRUD6Schema()
 
-// For permissions, we can use hasPermission but avoid any automatic schema loading
-// by using the composable in a way that doesn't trigger schema loading
-const schemaComposable = useCRUD6Schema()
-const hasPermission = schemaComposable.hasPermission
+// Always use provided schema from PageRow - no need to load schema independently
+// This maintains consistency with PageList.vue destructuring pattern while avoiding redundant calls
+const schema = computed(() => providedSchema || composableSchema.value)
 
 // Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))
