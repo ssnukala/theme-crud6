@@ -68,8 +68,8 @@ function formatFieldValue(value: any, field: any): string {
     }
 }
 
-// Schema loading is handled by parent PageRow component and passed as a prop
-// PageRow always provides schema, so no loading states needed here
+// Schema loading is completely handled by parent PageRow component and passed as a prop
+// When schema prop is provided, we don't use the composable at all to avoid redundant API calls
 </script>
 
 <template>
