@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useCRUD6Schema } from '@ssnukala/sprinkle-crud6/composables'
 import type { CRUD6Response } from '@ssnukala/sprinkle-crud6/interfaces'
@@ -85,12 +85,8 @@ function formatFieldValue(value: any, field: any): string {
     }
 }
 
-// Load schema when component mounts (only if schema not provided as prop)
-onMounted(() => {
-    if (model.value && !providedSchema && !composableSchema.value) {
-        loadSchema(model.value)
-    }
-})
+// Schema loading is handled by parent PageRow component
+// No need to load schema here as it's always passed as a prop from PageRow
 </script>
 
 <template>
