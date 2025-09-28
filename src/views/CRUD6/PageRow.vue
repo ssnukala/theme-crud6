@@ -181,12 +181,18 @@ function formatFieldValue(value: any, field: any): string {
 
 // Load data when component mounts
 onMounted(async () => {
+    console.log('[PageRow] 🚀 Component mounted - route:', route.path, 'model:', model.value, 'recordId:', recordId.value)
+    console.log('[PageRow] 📋 Mount state - isCreateMode:', isCreateMode.value, 'hasSchema:', !!schema.value)
+    
     // Schema loading is handled by the route watcher with immediate: true
     // No need to load schema here to avoid duplicate calls
+    console.log('[PageRow] 📝 Schema loading delegated to model watcher to avoid duplicate API calls')
     
     if (!isCreateMode.value && recordId.value) {
+        console.log('[PageRow] 📖 Fetching record data for ID:', recordId.value)
         fetch()
     } else if (isCreateMode.value) {
+        console.log('[PageRow] ➕ Initialize create mode with schema-based record structure')
         // Initialize empty record for create mode using schema
         record.value = {}
         CRUD6Row.value = createInitialRecord(schema.value?.fields)
@@ -211,9 +217,15 @@ watch(
 watch(
     () => schema.value,
     (newSchema) => {
+        console.log('[PageRow] 📊 Schema value changed - hasFields:', !!newSchema?.fields, 'isCreateMode:', isCreateMode.value)
         if (newSchema?.fields && isCreateMode.value) {
+            console.log('[PageRow] 🔄 Updating initial record structure for create mode with schema fields:', Object.keys(newSchema.fields))
             // Update the initial record structure when schema loads in create mode
             CRUD6Row.value = createInitialRecord(newSchema.fields)
+        } else if (newSchema?.fields) {
+            console.log('[PageRow] 📝 Schema available but not in create mode - no record structure update needed')
+        } else {
+            console.log('[PageRow] ⚠️  Schema change but no fields available yet')
         }
     }
 )
@@ -221,18 +233,29 @@ watch(
 // Load schema when model changes - single source of truth for schema loading
 let currentModel = ''
 watch(model, async (newModel) => {
+    console.log('[PageRow] Schema loading watcher triggered - model:', newModel, 'currentModel:', currentModel, 'route:', route.path)
     if (newModel && loadSchema && newModel !== currentModel) {
         try {
-            console.log('[PageRow] Loading schema for model:', newModel)
+            console.log('[PageRow] 🔄 Starting schema API call for model:', newModel, 'at route:', route.path)
+            console.log('[PageRow] 📍 Schema loading context - recordId:', recordId.value, 'isCreateMode:', isCreateMode.value)
             currentModel = newModel
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
                 await schemaPromise
-                console.log('[PageRow] Schema loaded successfully for:', newModel)
+                console.log('[PageRow] ✅ Schema loaded successfully for model:', newModel, 'with fields:', Object.keys(schema.value?.fields || {}))
+                console.log('[PageRow] 📊 Schema details - title:', schema.value?.title, 'field count:', Object.keys(schema.value?.fields || {}).length)
             }
         } catch (error) {
-            console.error('[PageRow] Failed to load schema:', error)
+            console.error('[PageRow] ❌ Failed to load schema for model:', newModel, 'error:', error)
         }
+    } else {
+        console.log('[PageRow] ⏭️  Skipping schema load - conditions not met:', {
+            hasModel: !!newModel,
+            hasLoadSchema: !!loadSchema,
+            modelChanged: newModel !== currentModel,
+            model: newModel,
+            currentModel: currentModel
+        })
     }
 }, { immediate: true })
 

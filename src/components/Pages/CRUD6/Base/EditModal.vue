@@ -22,9 +22,14 @@ const emits = defineEmits(['saved'])
  * Methods - Submit the form to the API and handle the response.
  */
 const formSuccess = () => {
+    console.log('[EditModal] ✅ Form submitted successfully for crud6.id:', props.crud6.id)
     emits('saved')
     UIkit.modal('#modal-crud6-edit-' + props.crud6.id).hide()
 }
+
+// Debug logging for prop analysis  
+console.log('[EditModal] 🚀 Component setup - crud6.id:', props.crud6?.id, 'model:', props.model, 'hasSchema:', !!props.schema)
+console.log('[EditModal] 📊 Schema details passed to Form - title:', props.schema?.title, 'fields:', Object.keys(props.schema?.fields || {}))
 </script>
 
 <template>

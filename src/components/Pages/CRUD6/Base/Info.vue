@@ -14,6 +14,8 @@ const { crud6, schema: providedSchema } = defineProps<{
     schema?: any
 }>()
 
+console.log('[Info] 🚀 Component setup - hasProvidedSchema:', !!providedSchema, 'crud6.id:', crud6?.id, 'route:', route.path)
+
 const emits = defineEmits(['crud6Updated'])
 
 // Get model from route parameter for schema loading
@@ -25,10 +27,14 @@ const showDeleteModal = ref(false)
 
 // Helper functions to lazily load modals
 function requestEditModal() {
+    console.log('[Info] 🔧 Edit modal requested - lazy loading EditModal component')
+    console.log('[Info] 📊 Schema will be passed to EditModal - title:', finalSchema.value?.title, 'hasFields:', !!finalSchema.value?.fields)
     showEditModal.value = true
 }
 
 function requestDeleteModal() {
+    console.log('[Info] 🗑️  Delete modal requested - lazy loading DeleteModal component') 
+    console.log('[Info] 📊 Schema will be passed to DeleteModal - title:', finalSchema.value?.title, 'hasFields:', !!finalSchema.value?.fields)
     showDeleteModal.value = true
 }
 
@@ -43,7 +49,23 @@ const {
 
 // Override schema with provided prop when available (PageList.vue doesn't have this need)
 // This maintains PageList.vue destructuring pattern while respecting PageRow's provided schema
-const finalSchema = computed(() => providedSchema || schema.value)
+const finalSchema = computed(() => {
+    const hasProvidedSchema = !!providedSchema
+    const hasComposableSchema = !!schema.value
+    console.log('[Info] 📊 Schema resolution - providedSchema:', hasProvidedSchema, 'composableSchema:', hasComposableSchema, 'route:', route.path)
+    
+    if (hasProvidedSchema) {
+        console.log('[Info] ✅ Using provided schema prop from PageRow - NO API call needed')
+        console.log('[Info] 📋 Provided schema details - title:', providedSchema?.title, 'fields:', Object.keys(providedSchema?.fields || {}))
+        return providedSchema
+    } else if (hasComposableSchema) {
+        console.log('[Info] 🔄 Using composable schema (fallback) - this indicates missing schema prop')
+        return schema.value
+    } else {
+        console.log('[Info] ⚠️  No schema available from either source')
+        return null
+    }
+})
 
 // Permission checks using schema-driven permissions
 const hasUpdatePermission = computed(() => hasPermission('update'))

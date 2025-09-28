@@ -13,6 +13,13 @@ const props = defineProps<{
     schema?: any
 }>()
 
+console.log('[Form] 🚀 Component setup - hasProvidedSchema:', !!props.schema, 'model:', props.model, 'isEdit:', !!props.crud6)
+if (props.schema) {
+    console.log('[Form] 📊 Schema provided by parent - title:', props.schema?.title, 'fieldCount:', Object.keys(props.schema?.fields || {}).length)
+} else {
+    console.log('[Form] ⚠️  No schema provided - will attempt to load via composable if model available')
+}
+
 /**
  * API - Use the CRUD6 edit API
  */
@@ -70,22 +77,29 @@ watch(
 watch(
     () => props.model,
     (newModel) => {
+        console.log('[Form] 📊 Model prop changed to:', newModel, 'hasSchemaProps:', !!props.schema, 'hasLoadSchema:', !!loadSchema)
         // Only load schema if ALL conditions are met:
         // 1. We have a model
         // 2. We have a loadSchema function 
         // 3. NO schema was provided as a prop (PageRow should provide it)
         if (newModel && loadSchema && !props.schema) {
-            console.log('[Form] Loading schema for model (no schema prop provided):', newModel)
+            console.log('[Form] 🔄 Loading schema for model (no schema prop provided):', newModel)
+            console.log('[Form] 📍 Context - this indicates Form is used standalone without PageRow schema prop')
             const schemaPromise = loadSchema(newModel)
             if (schemaPromise && typeof schemaPromise.then === 'function') {
-                schemaPromise.catch((error) => {
-                    console.error('[Form] Failed to load schema:', error)
+                schemaPromise.then(() => {
+                    console.log('[Form] ✅ Schema loaded via composable for model:', newModel)
+                }).catch((error) => {
+                    console.error('[Form] ❌ Failed to load schema via composable:', error)
                 })
             }
         } else if (props.schema) {
-            console.log('[Form] Using provided schema prop - NO API call for model:', newModel)
+            console.log('[Form] ✅ Using provided schema prop - NO API call for model:', newModel)
+            console.log('[Form] 📋 Provided schema from parent - title:', props.schema?.title, 'fields:', Object.keys(props.schema?.fields || {}))
+            console.log('[Form] 🎯 This is the OPTIMIZED path - schema loaded once by PageRow and passed down')
         } else {
-            console.log('[Form] No schema loading needed - missing model or loadSchema function')
+            console.log('[Form] ⚠️  No schema loading needed - missing model or loadSchema function')
+            console.log('[Form] 📊 Conditions - model:', !!newModel, 'loadSchema:', !!loadSchema, 'hasSchemaProps:', !!props.schema)
         }
     },
     { immediate: true }

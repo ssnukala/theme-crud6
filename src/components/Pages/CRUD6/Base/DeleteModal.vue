@@ -17,6 +17,11 @@ const props = defineProps<{
     schema?: any
 }>()
 
+console.log('[DeleteModal] 🚀 Component setup - crud6.id:', props.crud6?.id, 'model:', props.model, 'hasSchema:', !!props.schema)
+if (props.schema) {
+    console.log('[DeleteModal] 📊 Schema provided for context - title:', props.schema?.title)
+}
+
 /**
  * Emits - Define the deleted event. This event is emitted when the CRUD6 object is deleted
  * to notify the parent component to refresh the data.
@@ -27,11 +32,15 @@ const emits = defineEmits(['deleted'])
  * Methods - Submit the form to the API and handle the response.
  */
 const deleteConfirmed = () => {
+    console.log('[DeleteModal] 🗑️  Delete confirmed for crud6.slug:', props.crud6.slug)
     deleteCRUD6(props.crud6.slug)
         .then(() => {
+            console.log('[DeleteModal] ✅ Delete successful for:', props.crud6.slug)
             emits('deleted')
         })
-        .catch(() => {})
+        .catch((error) => {
+            console.error('[DeleteModal] ❌ Delete failed for:', props.crud6.slug, 'error:', error)
+        })
 }
 </script>
 
