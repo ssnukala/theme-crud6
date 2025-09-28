@@ -38,29 +38,22 @@ function requestDeleteModal() {
     showDeleteModal.value = true
 }
 
-// Use schema composable with same pattern as PageList.vue
-const {
-    schema,
-    loading: schemaLoading,
-    error: schemaError,
-    loadSchema,
-    hasPermission
-} = useCRUD6Schema()
+// Conditional composable usage - only when no schema prop provided
+// This prevents the automatic schema loading that happens in useCRUD6Schema initialization
+const schemaComposable = providedSchema ? null : useCRUD6Schema()
 
-// Override schema with provided prop when available (PageList.vue doesn't have this need)
-// This maintains PageList.vue destructuring pattern while respecting PageRow's provided schema
+// Extract functions with fallbacks
+const hasPermission = schemaComposable?.hasPermission || (() => true)
+
+// Final schema resolution - prioritize provided schema
 const finalSchema = computed(() => {
-    const hasProvidedSchema = !!providedSchema
-    const hasComposableSchema = !!schema.value
-    console.log('[Info] 📊 Schema resolution - providedSchema:', hasProvidedSchema, 'composableSchema:', hasComposableSchema, 'route:', route.path)
-    
-    if (hasProvidedSchema) {
+    if (providedSchema) {
         console.log('[Info] ✅ Using provided schema prop from PageRow - NO API call needed')
         console.log('[Info] 📋 Provided schema details - title:', providedSchema?.title, 'fields:', Object.keys(providedSchema?.fields || {}))
         return providedSchema
-    } else if (hasComposableSchema) {
+    } else if (schemaComposable?.schema.value) {
         console.log('[Info] 🔄 Using composable schema (fallback) - this indicates missing schema prop')
-        return schema.value
+        return schemaComposable.schema.value
     } else {
         console.log('[Info] ⚠️  No schema available from either source')
         return null
