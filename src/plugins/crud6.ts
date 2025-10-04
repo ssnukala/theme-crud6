@@ -13,7 +13,7 @@ import {
 } from '../components/Pages/CRUD6'
 
 /**
- * Register every admin components & views globally
+ * Register CRUD6 components & views globally
  * See : https://vuejs.org/guide/components/registration
  */
 export default {

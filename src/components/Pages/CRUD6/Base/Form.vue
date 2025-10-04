@@ -27,6 +27,12 @@ const { createRow, updateRow, r$, formData, apiLoading, resetForm, slugLocked } 
 
 /**
  * Schema - Use the CRUD6 schema composable for dynamic form generation or use provided schema
+ * 
+ * Schema source resolution strategy:
+ * 1. If parent provides schema prop → use it (optimized, no API call)
+ * 2. Otherwise → load via composable (standalone usage)
+ * This allows Form to work both in optimized PageRow/PageList context
+ * and as a standalone component.
  */
 const {
     schema: composableSchema,
