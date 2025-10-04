@@ -23,7 +23,7 @@ if (props.schema) {
 /**
  * API - Use the CRUD6 edit API
  */
-const { createCRUD6, updateCRUD6, r$, formData, apiLoading, resetForm, slugLocked } = useCRUD6Api()
+const { createRow, updateRow, r$, formData, apiLoading, resetForm, slugLocked } = useCRUD6Api()
 
 /**
  * Schema - Use the CRUD6 schema composable for dynamic form generation or use provided schema
@@ -127,8 +127,8 @@ const submitForm = async () => {
     if (!isValid.valid) return
 
     const apiCall = props.crud6
-        ? updateCRUD6(props.crud6.slug, formData.value)
-        : createCRUD6(formData.value)
+        ? updateRow(props.crud6.slug, formData.value)
+        : createRow(formData.value)
     apiCall
         .then(() => {
             emits('success')

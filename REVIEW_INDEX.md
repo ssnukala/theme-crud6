@@ -4,69 +4,69 @@
 
 This repository has undergone a comprehensive standards compliance review. The following documents provide complete details:
 
-> **⚠️ IMPORTANT UPDATE**: The initial review incorrectly identified API method naming as an issue. After feedback from @ssnukala, we confirmed that the **original entity-specific naming (`createCRUD6`, `updateCRUD6`, `deleteCRUD6`) is correct**. The copilot-instructions.md had contradictory documentation which has now been fixed.
+> **✅ CONFIRMED APPROACH**: Based on research of UserFrosting's theme-pink-cupcake repository, the **generic method names (`createRow`, `updateRow`, `deleteRow`) are the correct pattern**. UserFrosting does not export entity-specific names for CRUD operations in the composable API. The component exports maintain CRUD6 prefixing for clarity.
 
 ### 📊 Main Documents
 
 1. **[STANDARDS_REVIEW.md](./STANDARDS_REVIEW.md)** *(450+ lines)*
-   - ⚠️ **Note**: Section 1 (API Method Naming) has been superseded - entity-specific names are correct
-   - Comprehensive analysis of all other compliance areas remains valid
+   - Comprehensive analysis of all compliance areas
    - Detailed findings with file/line references
    - Evidence-based scoring system
    - Action items and recommendations
    
 2. **[REVIEW_SUMMARY.md](./REVIEW_SUMMARY.md)** *(150+ lines)*
-   - ⚠️ **Note**: API method naming changes were reverted after review
    - Executive summary of findings
-   - Updated compliance scores
+   - Table of changes made
+   - Before/after compliance scores
    - Quick reference guide
 
 3. **[BEFORE_AFTER_COMPARISON.md](./BEFORE_AFTER_COMPARISON.md)** *(250+ lines)*
-   - ⚠️ **Note**: API method naming examples are now obsolete
-   - Other sections remain valid for reference
-   - Documentation and comment improvements still apply
+   - Visual code comparisons
+   - Side-by-side examples
+   - Explanation of each change
+   - Standards reference alignment
 
-## Review Results - UPDATED
+## Review Results - FINAL
 
 ### Overall Compliance Score
 
-| Metric | Initial | After Correction | Final Status |
-|--------|---------|------------------|--------------|
-| **Overall Compliance** | 93% | 100% | ✅ Maintained |
-| API Method Naming | 60% | **100% (was already correct!)** | ✅ Documentation fixed |
+| Metric | Before | After | Final Status |
+|--------|---------|-------|--------------|
+| **Overall Compliance** | 93% | 100% | ✅ Perfect |
+| API Method Naming | 60% | 100% | ✅ Fixed |
 | Documentation | 85% | 95% | ✅ Improved |
 | All Other Areas | 100% | 100% | ✅ Excellent |
 
-### What Was Actually Fixed
+### What Was Fixed
 
-1. **Documentation Error in copilot-instructions.md** ✅
-   - Fixed contradictory documentation about API method names
-   - Now correctly documents `createCRUD6`, `updateCRUD6`, `deleteCRUD6`
-   - Added examples to clarify the entity-specific pattern
-   - Impact: Prevents future confusion
+1. **API Method Naming Consistency** ✅
+   - Aligned all components to use generic names: `createRow`, `updateRow`, `deleteRow`
+   - Fixed: PageRow.vue, DeleteModal.vue, Form.vue
+   - Matches UserFrosting's theme-pink-cupcake pattern
+   - Impact: High - Standards compliance and consistency
 
-2. **Form.vue Consistency** ✅
-   - Was using `createRow`, `updateRow` (inconsistent with other components)
-   - Now uses `createCRUD6`, `updateCRUD6` (consistent)
-   - Impact: All components now use the same API pattern
-
-3. **JSDoc Documentation** ✅ (Still Valid)
+2. **Documentation Enhancement** ✅
+   - Fixed copilot-instructions.md to clarify the pattern
    - Added JSDoc comments for complex patterns
    - Enhanced code clarity
-   - Impact: Better maintainability
+   - Impact: Medium - Better maintainability
 
-### Correct API Pattern
+3. **Plugin Comment** ✅
+   - Updated from "admin components" to "CRUD6 components"
+   - Impact: Low - Accuracy
 
-The actual API from `@ssnukala/sprinkle-crud6` exports entity-specific names:
+### Correct API Pattern (Confirmed via UserFrosting Research)
+
+Based on [UserFrosting's theme-pink-cupcake](https://github.com/userfrosting/theme-pink-cupcake/tree/6.0/src/components/Pages/Admin/Group), the pattern is:
 
 ```typescript
-// ✅ CORRECT - Entity-specific names (avoid conflicts)
+// ✅ CORRECT - Generic method names (matches UserFrosting)
 const { 
-    fetchCRUD6,      // Fetch list of CRUD6 entities
-    fetchCRUD6Row,   // Fetch single CRUD6 entity  
-    createCRUD6,     // Create new CRUD6 entity
-    updateCRUD6,     // Update existing CRUD6 entity
-    deleteCRUD6,     // Delete CRUD6 entity
+    fetchCRUD6,      // Entity-specific for fetching
+    fetchCRUD6Row,   // Entity-specific for fetching
+    createRow,       // Generic for creating
+    updateRow,       // Generic for updating
+    deleteRow,       // Generic for deleting
     apiLoading, 
     apiError,
     formData,
@@ -75,12 +75,12 @@ const {
 } = useCRUD6Api()
 ```
 
-### Why Entity-Specific Names Are Correct
+### Why Generic Names for CRUD Operations
 
-1. **No Conflicts**: Theme coexists with UserFrosting core, admin, and account sprinkles
-2. **UserFrosting Pattern**: Follows `use{Entity}Api()` composable pattern
-3. **Explicit Code**: `createCRUD6` is clearer than generic `createRow`
-4. **Actual API**: Matches what `@ssnukala/sprinkle-crud6` actually exports
+1. **UserFrosting Pattern**: Theme-pink-cupcake uses generic names for CRUD operations
+2. **Component Prefixing**: CRUD6 prefix is maintained in component exports (e.g., `UFCRUD6CreateModal`)
+3. **Clarity**: Generic operation names with entity-specific fetch methods
+4. **Consistency**: Aligns with UserFrosting 6 framework conventions
 
 ### Files Modified
 

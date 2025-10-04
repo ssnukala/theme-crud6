@@ -300,9 +300,9 @@ ALWAYS use the provided composables, following UserFrosting naming conventions:
 const { 
     fetchCRUD6,           // Fetch list of entities
     fetchCRUD6Row,        // Fetch single entity  
-    createCRUD6,          // Create new entity
-    updateCRUD6,          // Update existing entity
-    deleteCRUD6,          // Delete entity
+    createRow,            // Create new entity
+    updateRow,            // Update existing entity
+    deleteRow,            // Delete entity
     apiLoading, 
     apiError,
     formData,
@@ -323,11 +323,9 @@ const {
 ```
 
 **Important**: The composable methods follow UserFrosting patterns:
-- `create{Entity}` for creating new records (e.g., `createCRUD6`)
-- `update{Entity}` for updating existing records (e.g., `updateCRUD6`)
-- `delete{Entity}` for deleting records (e.g., `deleteCRUD6`)
-- `fetch{Entity}` for getting lists (e.g., `fetchCRUD6`)
-- `fetch{Entity}Row` for getting single records (e.g., `fetchCRUD6Row`)
+- Generic method names for common operations: `createRow`, `updateRow`, `deleteRow`
+- Entity-specific method names for fetching: `fetch{Entity}`, `fetch{Entity}Row`
+- This pattern avoids conflicts between sprinkles while maintaining clarity
 
 ### 2. Error Handling
 Follow UserFrosting error patterns:
