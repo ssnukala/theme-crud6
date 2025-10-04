@@ -298,8 +298,8 @@ ALWAYS use the provided composables, following UserFrosting naming conventions:
 ```typescript
 // API operations (follows UserFrosting pattern: use{Entity}Api)
 const { 
-    fetchCRUD6,           // Fetch list of entities
-    fetchCRUD6Row,        // Fetch single entity  
+    fetchRows,            // Fetch list of entities
+    fetchRow,             // Fetch single entity  
     createRow,            // Create new entity
     updateRow,            // Update existing entity
     deleteRow,            // Delete entity
@@ -323,9 +323,9 @@ const {
 ```
 
 **Important**: The composable methods follow UserFrosting patterns:
-- Generic method names for common operations: `createRow`, `updateRow`, `deleteRow`
-- Entity-specific method names for fetching: `fetch{Entity}`, `fetch{Entity}Row`
+- Generic method names for all operations: `fetchRows`, `fetchRow`, `createRow`, `updateRow`, `deleteRow`
 - This pattern avoids conflicts between sprinkles while maintaining clarity
+- Component exports maintain CRUD6 prefixing for entity context
 
 ### 2. Error Handling
 Follow UserFrosting error patterns:

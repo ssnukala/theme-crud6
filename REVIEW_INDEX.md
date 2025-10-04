@@ -62,8 +62,8 @@ Based on [UserFrosting's theme-pink-cupcake](https://github.com/userfrosting/the
 ```typescript
 // ✅ CORRECT - Generic method names (matches UserFrosting)
 const { 
-    fetchCRUD6,      // Entity-specific for fetching
-    fetchCRUD6Row,   // Entity-specific for fetching
+    fetchRows,       // Generic for fetching list
+    fetchRow,        // Generic for fetching single entity
     createRow,       // Generic for creating
     updateRow,       // Generic for updating
     deleteRow,       // Generic for deleting
@@ -75,12 +75,12 @@ const {
 } = useCRUD6Api()
 ```
 
-### Why Generic Names for CRUD Operations
+### Why Generic Names for All Operations
 
-1. **UserFrosting Pattern**: Theme-pink-cupcake uses generic names for CRUD operations
-2. **Component Prefixing**: CRUD6 prefix is maintained in component exports (e.g., `UFCRUD6CreateModal`)
-3. **Clarity**: Generic operation names with entity-specific fetch methods
-4. **Consistency**: Aligns with UserFrosting 6 framework conventions
+1. **Full Consistency**: All API methods use generic names for maximum consistency
+2. **UserFrosting Pattern**: Aligns with UserFrosting's composable API conventions
+3. **Component Prefixing**: CRUD6 prefix in component exports (e.g., `UFCRUD6CreateModal`) provides entity context
+4. **Clarity**: Generic operation names with entity-specific context from component prefixes
 
 ### Files Modified
 

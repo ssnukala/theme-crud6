@@ -31,8 +31,8 @@ const {
 } = useCRUD6Schema()
 
 const {
-    fetchCRUD6,
-    fetchCRUD6Row,
+    fetchRows,
+    fetchRow,
     createRow,
     updateRow,
     apiLoading,
@@ -114,8 +114,8 @@ const hasViewPermission = computed(() => hasPermission('view'))
  * Methods - Fetch record
  */
 function fetch() {
-    if (recordId.value && fetchCRUD6Row) {
-        const fetchPromise = fetchCRUD6Row(recordId.value)
+    if (recordId.value && fetchRow) {
+        const fetchPromise = fetchRow(recordId.value)
         if (fetchPromise && typeof fetchPromise.then === 'function') {
             fetchPromise.then((fetchedRow) => {
                 CRUD6Row.value = fetchedRow.data
