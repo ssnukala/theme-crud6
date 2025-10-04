@@ -33,8 +33,8 @@ const {
 const {
     fetchCRUD6,
     fetchCRUD6Row,
-    createRow,
-    updateRow,
+    createCRUD6,
+    updateCRUD6,
     apiLoading,
     apiError,
     formData,
@@ -147,10 +147,10 @@ async function saveRecord() {
 
     try {
         if (isCreateMode.value) {
-            await createRow(record.value)
+            await createCRUD6(record.value)
             router.push(`/crud6/${model.value}`)
         } else {
-            await updateRow(recordId.value, record.value)
+            await updateCRUD6(recordId.value, record.value)
             isEditMode.value = false
             originalRecord.value = { ...record.value }
             CRUD6Row.value = { ...record.value } as CRUD6Response

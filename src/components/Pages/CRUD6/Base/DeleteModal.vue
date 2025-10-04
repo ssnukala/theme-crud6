@@ -6,7 +6,7 @@ import { Severity } from '@userfrosting/sprinkle-core/interfaces'
 /**
  * Variables and composables
  */
-const { deleteRow } = useCRUD6Api()
+const { deleteCRUD6 } = useCRUD6Api()
 
 /**
  * Props - The CRUD6 object to delete, optional model and schema for consistency
@@ -33,7 +33,7 @@ const emits = defineEmits(['deleted'])
  */
 const deleteConfirmed = () => {
     console.log('[DeleteModal] 🗑️  Delete confirmed for crud6.slug:', props.crud6.slug)
-    deleteRow(props.crud6.slug)
+    deleteCRUD6(props.crud6.slug)
         .then(() => {
             console.log('[DeleteModal] ✅ Delete successful for:', props.crud6.slug)
             emits('deleted')
