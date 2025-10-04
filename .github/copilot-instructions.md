@@ -2,6 +2,34 @@
 
 This repository extends UserFrosting 6's Pink Cupcake theme to provide dynamic CRUD operations for any model/entity. The core design principle is to **strictly follow UserFrosting conventions** and utilize all built-in components, composables, and plugins from UserFrosting Core and Admin sprinkles.
 
+## UserFrosting 6 Framework Reference
+
+**CRITICAL**: Any code modifications or refactoring MUST consider the UserFrosting 6 framework and reference the following official repositories to ensure adherence to established standards and patterns:
+
+### Official Reference Repositories
+1. **[userfrosting/sprinkle-core](https://github.com/userfrosting/sprinkle-core/tree/6.0)** - Core components, composables, interfaces, and foundational patterns
+2. **[userfrosting/sprinkle-admin](https://github.com/userfrosting/sprinkle-admin/tree/6.0)** - Admin interface patterns, CRUD operations reference implementation
+3. **[userfrosting/framework](https://github.com/userfrosting/framework/tree/6.0)** - Framework architecture, service providers, and system-level components
+4. **[userfrosting/theme-pink-cupcake](https://github.com/userfrosting/theme-pink-cupcake/tree/6.0)** - Base theme implementation, component styling, and UI patterns
+
+### Development Guidelines
+- **Always check reference repositories first** before creating new components or patterns
+- **Extend and reuse** existing framework components rather than reimplementing functionality
+- **Follow established patterns** from sprinkle-admin for CRUD operations and component structure
+- **Leverage core components** from sprinkle-core for common UI elements, composables, and utilities
+- **Maintain consistency** with theme-pink-cupcake styling and component architecture
+- **Study framework** architecture for proper service integration and dependency injection patterns
+
+### When Making Changes
+1. **Before implementing**: Search the reference repositories for existing solutions
+2. **Component design**: Model after sprinkle-admin patterns (especially Group management)
+3. **Styling**: Follow theme-pink-cupcake conventions and component structure
+4. **Composables**: Use or extend sprinkle-core composables rather than creating duplicates
+5. **Type definitions**: Import types from appropriate sprinkle packages
+6. **API patterns**: Follow framework conventions for routing, middleware, and controllers
+
+The goal is to create a seamless extension of the UserFrosting ecosystem that feels native to the framework, not a separate system layered on top.
+
 ## Architecture Principles
 
 ### 1. Schema-Driven Development
