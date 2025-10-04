@@ -6,7 +6,7 @@ import PageList from '../views/CRUD6/PageList.vue'
 // Mock the composables
 vi.mock('@ssnukala/sprinkle-crud6/composables', () => ({
   useCRUD6Api: () => ({
-    deleteCRUD6: vi.fn(),
+    deleteRow: vi.fn(),
   }),
   useCRUD6Schema: () => ({
     schema: ref(mockSchema),

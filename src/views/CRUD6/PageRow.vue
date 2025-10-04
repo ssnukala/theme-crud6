@@ -31,10 +31,10 @@ const {
 } = useCRUD6Schema()
 
 const {
-    fetchCRUD6,
-    fetchCRUD6Row,
-    createCRUD6,
-    updateCRUD6,
+    fetchRows,
+    fetchRow,
+    createRow,
+    updateRow,
     apiLoading,
     apiError,
     formData,
@@ -114,8 +114,8 @@ const hasViewPermission = computed(() => hasPermission('view'))
  * Methods - Fetch record
  */
 function fetch() {
-    if (recordId.value && fetchCRUD6Row) {
-        const fetchPromise = fetchCRUD6Row(recordId.value)
+    if (recordId.value && fetchRow) {
+        const fetchPromise = fetchRow(recordId.value)
         if (fetchPromise && typeof fetchPromise.then === 'function') {
             fetchPromise.then((fetchedRow) => {
                 CRUD6Row.value = fetchedRow.data
@@ -147,10 +147,10 @@ async function saveRecord() {
 
     try {
         if (isCreateMode.value) {
-            await createCRUD6(record.value)
+            await createRow(record.value)
             router.push(`/crud6/${model.value}`)
         } else {
-            await updateCRUD6(recordId.value, record.value)
+            await updateRow(recordId.value, record.value)
             isEditMode.value = false
             originalRecord.value = { ...record.value }
             CRUD6Row.value = { ...record.value } as CRUD6Response

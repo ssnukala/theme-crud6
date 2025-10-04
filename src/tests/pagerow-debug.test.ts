@@ -31,10 +31,10 @@ const mockLoadSchema = vi.fn().mockImplementation((model: string) => {
 // Mock the composables
 vi.mock('@ssnukala/sprinkle-crud6/composables', () => ({
   useCRUD6Api: () => ({
-    fetchCRUD6: vi.fn(),
-    fetchCRUD6Row: vi.fn().mockResolvedValue({ data: { id: 1, name: 'Test Group' } }),
-    createCRUD6: vi.fn(),
-    updateCRUD6: vi.fn(),
+    fetchRows: vi.fn(),
+    fetchRow: vi.fn().mockResolvedValue({ data: { id: 1, name: 'Test Group' } }),
+    createRow: vi.fn(),
+    updateRow: vi.fn(),
     apiLoading: ref(false),
     apiError: ref(null),
     formData: ref({}),

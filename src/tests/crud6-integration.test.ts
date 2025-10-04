@@ -32,10 +32,10 @@ vi.mock('@ssnukala/sprinkle-crud6/composables', () => ({
     defaultSort: { value: 'name' }
   }),
   useCRUD6Api: () => ({
-    fetchCRUD6: vi.fn(),
-    fetchCRUD6Row: vi.fn(),
-    createCRUD6: vi.fn(),
-    updateCRUD6: vi.fn(),
+    fetchRows: vi.fn(),
+    fetchRow: vi.fn(),
+    createRow: vi.fn(),
+    updateRow: vi.fn(),
     apiLoading: { value: false },
     apiError: { value: null },
     formData: { value: {} },
