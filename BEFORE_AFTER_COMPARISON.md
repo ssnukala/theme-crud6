@@ -1,5 +1,13 @@
 # UserFrosting 6 Standards Compliance - Before & After
 
+> **⚠️ CORRECTION NOTICE**: The API method naming examples in this document were based on **incorrect interpretation** of the copilot instructions. After feedback from @ssnukala, we confirmed that:
+> 
+> - **Entity-specific names (`createCRUD6`, `updateCRUD6`, `deleteCRUD6`) are CORRECT**
+> - The copilot-instructions.md had contradictory documentation (now fixed)
+> - Only Form.vue needed to be changed to match the other components
+> 
+> The examples below showing changes to PageRow.vue and DeleteModal.vue are **obsolete** - those files were already correct and have been reverted to their original state.
+
 This document provides visual comparisons of the key changes made to achieve 100% UserFrosting 6 standards compliance.
 
 ## 1. API Method Naming - PageRow.vue

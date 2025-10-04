@@ -4,49 +4,83 @@
 
 This repository has undergone a comprehensive standards compliance review. The following documents provide complete details:
 
+> **⚠️ IMPORTANT UPDATE**: The initial review incorrectly identified API method naming as an issue. After feedback from @ssnukala, we confirmed that the **original entity-specific naming (`createCRUD6`, `updateCRUD6`, `deleteCRUD6`) is correct**. The copilot-instructions.md had contradictory documentation which has now been fixed.
+
 ### 📊 Main Documents
 
 1. **[STANDARDS_REVIEW.md](./STANDARDS_REVIEW.md)** *(450+ lines)*
-   - Comprehensive analysis of all compliance areas
+   - ⚠️ **Note**: Section 1 (API Method Naming) has been superseded - entity-specific names are correct
+   - Comprehensive analysis of all other compliance areas remains valid
    - Detailed findings with file/line references
    - Evidence-based scoring system
    - Action items and recommendations
    
 2. **[REVIEW_SUMMARY.md](./REVIEW_SUMMARY.md)** *(150+ lines)*
+   - ⚠️ **Note**: API method naming changes were reverted after review
    - Executive summary of findings
-   - Table of changes made
-   - Before/after compliance scores
+   - Updated compliance scores
    - Quick reference guide
 
 3. **[BEFORE_AFTER_COMPARISON.md](./BEFORE_AFTER_COMPARISON.md)** *(250+ lines)*
-   - Visual code comparisons
-   - Side-by-side examples
-   - Explanation of each change
-   - Standards reference alignment
+   - ⚠️ **Note**: API method naming examples are now obsolete
+   - Other sections remain valid for reference
+   - Documentation and comment improvements still apply
 
-## Review Results
+## Review Results - UPDATED
 
 ### Overall Compliance Score
 
-| Metric | Before | After | Change |
-|--------|--------|-------|--------|
-| **Overall Compliance** | 93% | 100% | +7% ✅ |
-| API Method Naming | 60% | 100% | +40% |
-| Documentation | 85% | 95% | +10% |
-| All Other Areas | 100% | 100% | Maintained |
+| Metric | Initial | After Correction | Final Status |
+|--------|---------|------------------|--------------|
+| **Overall Compliance** | 93% | 100% | ✅ Maintained |
+| API Method Naming | 60% | **100% (was already correct!)** | ✅ Documentation fixed |
+| Documentation | 85% | 95% | ✅ Improved |
+| All Other Areas | 100% | 100% | ✅ Excellent |
 
-### What Was Fixed
+### What Was Actually Fixed
 
-1. **API Method Naming** ✅
-   - Aligned all components to use `createRow`, `updateRow`, `deleteRow`
-   - Fixed: PageRow.vue, DeleteModal.vue
-   - Impact: High - Standards compliance
+1. **Documentation Error in copilot-instructions.md** ✅
+   - Fixed contradictory documentation about API method names
+   - Now correctly documents `createCRUD6`, `updateCRUD6`, `deleteCRUD6`
+   - Added examples to clarify the entity-specific pattern
+   - Impact: Prevents future confusion
 
-2. **Documentation** ✅
+2. **Form.vue Consistency** ✅
+   - Was using `createRow`, `updateRow` (inconsistent with other components)
+   - Now uses `createCRUD6`, `updateCRUD6` (consistent)
+   - Impact: All components now use the same API pattern
+
+3. **JSDoc Documentation** ✅ (Still Valid)
    - Added JSDoc comments for complex patterns
-   - Fixed plugin comment accuracy
-   - Created comprehensive review documents
-   - Impact: Medium - Code clarity
+   - Enhanced code clarity
+   - Impact: Better maintainability
+
+### Correct API Pattern
+
+The actual API from `@ssnukala/sprinkle-crud6` exports entity-specific names:
+
+```typescript
+// ✅ CORRECT - Entity-specific names (avoid conflicts)
+const { 
+    fetchCRUD6,      // Fetch list of CRUD6 entities
+    fetchCRUD6Row,   // Fetch single CRUD6 entity  
+    createCRUD6,     // Create new CRUD6 entity
+    updateCRUD6,     // Update existing CRUD6 entity
+    deleteCRUD6,     // Delete CRUD6 entity
+    apiLoading, 
+    apiError,
+    formData,
+    resetForm,
+    slugLocked
+} = useCRUD6Api()
+```
+
+### Why Entity-Specific Names Are Correct
+
+1. **No Conflicts**: Theme coexists with UserFrosting core, admin, and account sprinkles
+2. **UserFrosting Pattern**: Follows `use{Entity}Api()` composable pattern
+3. **Explicit Code**: `createCRUD6` is clearer than generic `createRow`
+4. **Actual API**: Matches what `@ssnukala/sprinkle-crud6` actually exports
 
 ### Files Modified
 
